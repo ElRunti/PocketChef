@@ -13,14 +13,14 @@ export function CategoryTabs({
 }: CategoryTabsProps) {
   return (
     <section className="mt-6">
-      <div className="hide-scrollbar flex gap-2 overflow-x-auto pb-1">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
         {categories.map((category) => {
           const isActive = category.id === activeCategory;
 
           return (
             <button
               className={[
-                "shrink-0 rounded-lg border px-4 py-2 text-sm font-bold transition",
+                "min-h-11 w-full rounded-lg border px-3 py-2 text-sm font-bold transition",
                 isActive
                   ? "border-[#1f7a5c] bg-[#1f7a5c] text-white shadow-sm"
                   : "border-[#dbe6d5] bg-white text-[#4d5f55]",

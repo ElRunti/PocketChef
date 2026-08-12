@@ -45,13 +45,21 @@ test("server-renders the Pocket Chef home page", async () => {
 });
 
 test("keeps Pocket Chef organized by modules", async () => {
-  const [page, layout, packageJson, homePage, recipeData, bottomNavigation] =
+  const [page, layout, styles, packageJson, homePage, categoryTabs, recipeData, bottomNavigation] =
     await Promise.all([
       readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
       readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+      readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
       readFile(new URL("../package.json", import.meta.url), "utf8"),
       readFile(
         new URL("../src/features/home/HomePage.tsx", import.meta.url),
+        "utf8",
+      ),
+      readFile(
+        new URL(
+          "../src/features/home/components/CategoryTabs.tsx",
+          import.meta.url,
+        ),
         "utf8",
       ),
       readFile(
@@ -66,10 +74,13 @@ test("keeps Pocket Chef organized by modules", async () => {
 
   assert.match(page, /@\/src\/features\/home\/HomePage/);
   assert.match(layout, /title:\s*"Pocket Chef"/);
+  assert.match(styles, /overflow-x:\s*hidden/);
   assert.match(packageJson, /"name": "pocket-chef"/);
   assert.doesNotMatch(packageJson, /react-loading-skeleton/);
   assert.match(homePage, /selectedIngredientIds/);
   assert.match(homePage, /GuidedModePreview/);
+  assert.match(categoryTabs, /grid-cols-2/);
+  assert.doesNotMatch(categoryTabs, /overflow-x-auto/);
   assert.match(recipeData, /status:\s*"pending"/);
   assert.match(recipeData, /ingredientIds/);
   assert.match(bottomNavigation, /ShieldCheck/);
