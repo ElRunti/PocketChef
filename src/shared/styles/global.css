@@ -500,6 +500,16 @@ img {
   -webkit-line-clamp: 2;
 }
 
+.recipe-card-header button.favorited {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.favorite-remove-button {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
 .recipe-meta {
   display: flex;
   flex-wrap: wrap;
@@ -620,7 +630,7 @@ img {
   box-shadow: 0 -0.7rem 2rem rgba(23, 32, 26, 0.08);
   display: grid;
   gap: 0.25rem;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   left: 0;
   padding: 0.5rem 0.75rem;
   position: fixed;

@@ -13,6 +13,7 @@ import { GuidedModePreview } from "./components/GuidedModePreview.jsx";
 import { IngredientSelector } from "./components/IngredientSelector.jsx";
 import { RecipeCard } from "./components/RecipeCard.jsx";
 import { SearchPanel } from "./components/SearchPanel.jsx";
+import { useFavorites } from "../favoritos/hooks/useFavorites.js";
 
 const initialIngredients = ["egg", "tomato", "cheese", "tortilla", "avocado"];
 
@@ -26,12 +27,13 @@ function countMissingIngredients(recipe, selectedIngredientIds) {
   ).length;
 }
 
-export function HomePage() {
+export function HomePage({ onNavigate }) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [selectedIngredientIds, setSelectedIngredientIds] =
     useState(initialIngredients);
   const [activeStep, setActiveStep] = useState(0);
+  const { toggleFavorite, isFavorite } = useFavorites();
 
   const approvedRecipes = recipes.filter((recipe) => recipe.status === "approved");
   const pendingRecipes = recipes.filter((recipe) => recipe.status === "pending");
@@ -134,6 +136,8 @@ export function HomePage() {
                         recipe,
                         selectedIngredientIds,
                       )}
+                      isFavorite={isFavorite(recipe.id)}
+                      onToggleFavorite={toggleFavorite}
                     />
                   ))
                 ) : (
@@ -158,7 +162,7 @@ export function HomePage() {
         </div>
       </div>
 
-      <BottomNavigation />
+      <BottomNavigation activePage="home" onNavigate={onNavigate} />
     </main>
   );
 }

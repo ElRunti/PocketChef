@@ -1,25 +1,22 @@
 import { Clock, Heart, Star } from "lucide-react";
 
-export function RecipeCard({ recipe, missingIngredients, isFavorite, onToggleFavorite }) {
-  const matchText =
-    missingIngredients === 0 ? "Lista para cocinar" : `Faltan ${missingIngredients}`;
-
+export function FavoriteRecipeCard({ recipe, onRemove }) {
   return (
     <article className="recipe-card">
       <img alt={recipe.title} src={recipe.image} />
       <div className="recipe-card-content">
         <div className="recipe-card-header">
           <div>
-            <p>{matchText}</p>
+            <p>Favorito</p>
             <h3>{recipe.title}</h3>
           </div>
           <button
             type="button"
-            className={isFavorite ? "favorited" : ""}
-            aria-label={isFavorite ? `Quitar ${recipe.title} de favoritos` : `Guardar ${recipe.title}`}
-            onClick={() => onToggleFavorite?.(recipe.id)}
+            className="favorite-remove-button"
+            aria-label={`Eliminar ${recipe.title} de favoritos`}
+            onClick={() => onRemove(recipe.id)}
           >
-            <Heart aria-hidden="true" fill={isFavorite ? "currentColor" : "none"} size={18} />
+            <Heart aria-hidden="true" fill="currentColor" size={18} />
           </button>
         </div>
 
