@@ -1,5 +1,5 @@
-import SubirRecetaPage from "./features/subir-receta/SubirRecetaPage.jsx";
+import { HomePage } from "./features/home/HomePage.jsx";
 
 export function App() {
-    return <SubirRecetaPage />;
-}
+  return <HomePage />;
+ }
