@@ -9,19 +9,26 @@ function RecipeForm() {
     const [difficulty, setDifficulty] = useState("");
     const [steps, setSteps] = useState([""]);
     const [ingredientIds, setIngredientIds] = useState([]);
+    const [image, setImage] = useState("");
     
     const handleSubmit = (e) => {
         e.preventDefault();
-
-        console.log({
+    
+        const newRecipe = {
+            id: crypto.randomUUID(),
             title,
             description,
             categoryId,
             time,
             difficulty,
+            image,
             ingredientIds,
-            steps
-        });
+            steps,
+            rating: 0,
+            status: "pending"
+        };
+    
+        console.log(newRecipe);
     };
 
     const handleIngredientChange = (ingredientId) => {
@@ -45,6 +52,15 @@ function RecipeForm() {
                     onChange={(e) => setTitle(e.target.value)}
                     placeholder="Ingrese el título de la receta"
                 />
+            </div>
+            <div>
+                <label htmlFor="image">Imagen de la receta:</label>
+                <input
+                    type="url"
+                    id="image"
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
+                    placeholder="Ingrese la URL de la imagen"/>
             </div>
             <div>
                 <label htmlFor="description">Descripción:</label>
