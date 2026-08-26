@@ -682,3 +682,383 @@ img {
     transform: translateX(-50%);
   }
 }
+/* =========================================
+   SUBIR RECETA - MOBILE
+========================================= */
+
+.recipe-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.recipe-form-intro {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 0.4rem 1.25rem rgba(23, 32, 26, 0.06);
+}
+
+.recipe-form-intro p {
+  color: var(--orange);
+  font-size: 0.7rem;
+  font-weight: 900;
+  margin: 0 0 0.3rem;
+  letter-spacing: 0.04em;
+}
+
+.recipe-form-intro h2 {
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.recipe-form-intro span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.45;
+  margin-top: 0.5rem;
+}
+
+/* SECCIONES */
+
+.recipe-form-section {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 0.4rem 1.25rem rgba(23, 32, 26, 0.06);
+}
+
+.form-section-title {
+  align-items: center;
+  display: flex;
+  margin-bottom: 1rem;
+}
+
+.form-section-title > div {
+  align-items: center;
+  display: flex;
+  gap: 0.65rem;
+}
+
+.form-section-title p {
+  align-items: center;
+  background: var(--green-soft);
+  border-radius: 999px;
+  color: var(--green);
+  display: flex;
+  font-size: 0.75rem;
+  font-weight: 900;
+  height: 2rem;
+  justify-content: center;
+  margin: 0;
+  width: 2rem;
+}
+
+.form-section-title h3 {
+  font-size: 1rem;
+  font-weight: 900;
+  margin: 0;
+}
+
+.form-section-description {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.45;
+  margin: -0.25rem 0 1rem;
+}
+
+/* CAMPOS */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  min-width: 0;
+}
+
+.form-field:last-child {
+  margin-bottom: 0;
+}
+
+.form-field label {
+  color: var(--foreground);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  appearance: none;
+  background: #fbfdf9;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  outline: none;
+  width: 100%;
+}
+
+.form-field input,
+.form-field select {
+  height: 3rem;
+  padding: 0 0.85rem;
+}
+
+.form-field textarea {
+  min-height: 7rem;
+  padding: 0.8rem 0.85rem;
+  resize: vertical;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #9aa69d;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-soft);
+}
+
+/* FILA DE CAMPOS
+   En móvil siguen uno debajo del otro */
+.form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+/* TIEMPO */
+
+.input-with-suffix {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.input-with-suffix input {
+  padding-right: 5rem;
+}
+
+.input-with-suffix span {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  pointer-events: none;
+  position: absolute;
+  right: 0.85rem;
+}
+
+/* IMAGEN */
+
+.image-upload {
+  background: #fbfdf9;
+  border: 1px dashed #bfd1c2;
+  border-radius: 0.7rem;
+  padding: 1rem;
+}
+
+.image-upload > input {
+  display: none;
+}
+
+.image-upload-button {
+  align-items: center;
+  background: var(--green);
+  border-radius: 0.6rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.85rem;
+  font-weight: 900;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.image-upload-button:active {
+  transform: translateY(1px);
+}
+
+.image-upload-hint {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0.65rem 0 0;
+  text-align: center;
+}
+
+.image-preview {
+  margin-top: 1rem;
+}
+
+.image-preview p {
+  color: var(--foreground);
+  font-size: 0.8rem;
+  font-weight: 900;
+  margin: 0 0 0.5rem;
+}
+
+.image-preview img {
+  border-radius: 0.65rem;
+  height: 12rem;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* PASOS */
+
+.step-editor {
+  margin-top: 0.5rem;
+}
+
+.step-editor > p {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.45;
+  margin: 0 0 1rem;
+}
+
+.step-card {
+  background: #fbfdf9;
+  border: 1px solid var(--line);
+  border-radius: 0.7rem;
+  margin-bottom: 0.75rem;
+  padding: 0.85rem;
+}
+
+.step-card > label:first-child {
+  color: var(--foreground);
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 900;
+  margin-bottom: 0.45rem;
+}
+
+.step-card textarea {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.4;
+  min-height: 5.5rem;
+  outline: none;
+  padding: 0.75rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.step-card textarea:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px var(--green-soft);
+}
+
+.step-card > label:not(:first-child) {
+  align-items: center;
+  color: #4d5f55;
+  display: flex;
+  font-size: 0.8rem;
+  font-weight: 800;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.step-card input[type="checkbox"] {
+  accent-color: var(--green);
+  height: 1rem;
+  width: 1rem;
+}
+
+.step-card > div {
+  margin-top: 0.75rem;
+}
+
+.step-card > div label {
+  color: var(--muted);
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 800;
+  margin-bottom: 0.35rem;
+}
+
+.step-card input[type="number"] {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  width: 100%;
+}
+
+.step-card > button {
+  background: transparent;
+  border: 0;
+  color: #b64029;
+  font-size: 0.75rem;
+  font-weight: 900;
+  margin-top: 0.75rem;
+  padding: 0;
+}
+
+.step-editor > button {
+  background: var(--green-soft);
+  border: 1px solid #c9e3d4;
+  border-radius: 0.6rem;
+  color: var(--green);
+  font-size: 0.85rem;
+  font-weight: 900;
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+/* MENSAJES */
+
+.recipe-form-message {
+  background: var(--green-soft);
+  border: 1px solid #c9e3d4;
+  border-radius: 0.6rem;
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1.4;
+  padding: 0.85rem;
+}
+
+/* BOTÓN FINAL */
+
+.submit-recipe-button {
+  background: var(--orange);
+  border: 0;
+  border-radius: 0.65rem;
+  box-shadow: 0 0.5rem 1rem rgba(241, 95, 59, 0.2);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 900;
+  min-height: 3.25rem;
+  padding: 0 1rem;
+  width: 100%;
+}
+
+.submit-recipe-button:active {
+  transform: translateY(1px);
+}
