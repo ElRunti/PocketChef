@@ -1,6 +1,8 @@
 import {useState} from "react";
 import {pantryIngredients} from "../../recipes/data/recipes.js";
 import StepEditor from "./StepEditor";
+import ImageUpload from "./ImageUpload.jsx";
+
 function RecipeForm() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -10,6 +12,7 @@ function RecipeForm() {
     const [steps, setSteps] = useState([""]);
     const [ingredientIds, setIngredientIds] = useState([]);
     const [image, setImage] = useState("");
+    
     
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -54,13 +57,12 @@ function RecipeForm() {
                 />
             </div>
             <div>
-                <label htmlFor="image">Imagen de la receta:</label>
-                <input
-                    type="url"
-                    id="image"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    placeholder="Ingrese la URL de la imagen"/>
+                <label>Imagen</label>
+
+                <ImageUpload
+                    image={image}
+                    setImage={setImage}
+                />
             </div>
             <div>
                 <label htmlFor="description">Descripción:</label>
