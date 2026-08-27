@@ -1,21 +1,27 @@
-import { Home, PlusCircle, Search, ShieldCheck, UserRound } from "lucide-react";
+import { Heart, Home, PlusCircle, Search, ShieldCheck, UserRound } from "lucide-react";
 
 const navItems = [
-  { label: "Inicio", icon: Home, active: true },
-  { label: "Buscar", icon: Search, active: false },
-  { label: "Subir", icon: PlusCircle, active: false },
-  { label: "Admin", icon: ShieldCheck, active: false },
-  { label: "Perfil", icon: UserRound, active: false },
+  { label: "Inicio", icon: Home, page: "home" },
+  { label: "Buscar", icon: Search, page: "search" },
+  { label: "Subir", icon: PlusCircle, page: "upload" },
+  { label: "Admin", icon: ShieldCheck, page: "admin" },
+  { label: "Favoritos", icon: Heart, page: "favoritos" },
+  { label: "Perfil", icon: UserRound, page: "profile" },
 ];
 
-export function BottomNavigation() {
+export function BottomNavigation({ activePage, onNavigate }) {
   return (
     <nav className="bottom-navigation" aria-label="Navegacion principal">
       {navItems.map((item) => {
         const Icon = item.icon;
 
         return (
-          <button className={item.active ? "active" : ""} key={item.label} type="button">
+          <button
+            className={item.page === activePage ? "active" : ""}
+            key={item.page}
+            type="button"
+            onClick={() => onNavigate?.(item.page)}
+          >
             <Icon aria-hidden="true" size={19} />
             <span>{item.label}</span>
           </button>
