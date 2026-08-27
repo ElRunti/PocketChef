@@ -3,6 +3,8 @@ import { flushSync } from "react-dom";
 import { Heart, Home, PlusCircle, Refrigerator, Search } from "lucide-react";
 import { AdminPage } from "./features/admin/AdminPage.jsx";
 import { AdminRecipeEditorPage } from "./features/admin/AdminRecipeEditorPage.jsx";
+import { AuthPage } from "./features/auth/AuthPage.jsx";
+import { useAuth } from "./features/auth/hooks/useAuth.js";
 import { RecipeCommunityPage } from "./features/community/RecipeCommunityPage.jsx";
 import { useRecipeCommunity } from "./features/community/hooks/useRecipeCommunity.js";
 import { DiscoverPage } from "./features/discover/DiscoverPage.jsx";
@@ -27,6 +29,7 @@ const navItems = [
 ];
 
 export function App() {
+  const auth = useAuth();
   const {
     recipeCatalog,
     approvedRecipes,
@@ -34,13 +37,13 @@ export function App() {
     submitRecipe,
     updateRecipe,
     moderateRecipe,
-  } = useRecipeCatalog();
+  } = useRecipeCatalog(auth.user, auth.profile);
   const {
     addComment,
     getRecipeComments,
     getRecipeRating,
     rateRecipe,
-  } = useRecipeCommunity();
+  } = useRecipeCommunity(auth.user, auth.profile);
   const sharedRecipeId = window.location.hash.replace(/^#/, "");
   const hasSharedRecipe = approvedRecipes.some(
     (recipe) => recipe.id === sharedRecipeId,
@@ -57,11 +60,13 @@ export function App() {
     pendingRecipes[0]?.id ?? recipeCatalog[0]?.id ?? "",
   );
   const [shareStatus, setShareStatus] = useState("");
+  const [postAuthView, setPostAuthView] = useState(null);
+  const [accessMessage, setAccessMessage] = useState("");
   const {
     favorites: favoriteRecipeIds,
     isFavorite,
     toggleFavorite,
-  } = useFavorites();
+  } = useFavorites(auth.user);
 
   const selectedRecipe =
     approvedRecipes.find((recipe) => recipe.id === selectedRecipeId) ??
@@ -82,6 +87,22 @@ export function App() {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [activeView]);
 
+  useEffect(() => {
+    if (activeView !== "auth" || !postAuthView || !auth.user || auth.loading) {
+      return;
+    }
+
+    if (postAuthView === "admin" && !auth.isAdmin) {
+      setAccessMessage("Tu cuenta no tiene permisos de administrador.");
+      setPostAuthView(null);
+      return;
+    }
+
+    setActiveView(postAuthView);
+    setPostAuthView(null);
+    setAccessMessage("");
+  }, [activeView, auth.isAdmin, auth.loading, auth.user, postAuthView]);
+
   function updateScreen(updateState) {
     if (document.startViewTransition) {
       document.startViewTransition(() => {
@@ -94,6 +115,29 @@ export function App() {
   }
 
   function navigateTo(viewId) {
+    if (viewId === "upload" && auth.isConfigured && !auth.user) {
+      setPostAuthView("upload");
+      setAccessMessage("Inicia sesion para publicar una receta.");
+      updateScreen(() => setActiveView("auth"));
+      return;
+    }
+
+    if (["admin", "admin-edit"].includes(viewId) && !auth.isAdmin) {
+      setPostAuthView(auth.user ? null : "admin");
+      setAccessMessage(
+        auth.user
+          ? "Tu cuenta no tiene permisos de administrador."
+          : "Inicia sesion con una cuenta administradora.",
+      );
+      updateScreen(() => setActiveView("auth"));
+      return;
+    }
+
+    if (viewId === "auth") {
+      setPostAuthView(null);
+      setAccessMessage("");
+    }
+
     if (window.location.hash) {
       window.history.replaceState(
         null,
@@ -281,6 +325,17 @@ export function App() {
   }
 
   if (activeView === "upload") {
+    if (auth.isConfigured && !auth.user) {
+      return (
+        <AuthPage
+          {...sharedPageProps}
+          accessMessage="Inicia sesion para publicar una receta."
+          auth={auth}
+          onBack={() => navigateTo("home")}
+        />
+      );
+    }
+
     return (
       <SubirRecetaPage
         {...sharedPageProps}
@@ -302,6 +357,17 @@ export function App() {
   }
 
   if (activeView === "admin") {
+    if (!auth.isAdmin) {
+      return (
+        <AuthPage
+          {...sharedPageProps}
+          accessMessage="Necesitas el rol administrador para entrar aqui."
+          auth={auth}
+          onBack={() => navigateTo("home")}
+        />
+      );
+    }
+
     return (
       <AdminPage
         {...sharedPageProps}
@@ -314,6 +380,17 @@ export function App() {
   }
 
   if (activeView === "admin-edit") {
+    if (!auth.isAdmin) {
+      return (
+        <AuthPage
+          {...sharedPageProps}
+          accessMessage="Necesitas el rol administrador para editar recetas."
+          auth={auth}
+          onBack={() => navigateTo("home")}
+        />
+      );
+    }
+
     return (
       <AdminRecipeEditorPage
         {...sharedPageProps}
@@ -338,13 +415,27 @@ export function App() {
     );
   }
 
+  if (activeView === "auth") {
+    return (
+      <AuthPage
+        {...sharedPageProps}
+        accessMessage={accessMessage}
+        auth={auth}
+        onBack={() => navigateTo("home")}
+      />
+    );
+  }
+
   return (
     <HomePage
       {...sharedPageProps}
       approvedRecipes={approvedRecipes}
+      currentProfile={auth.profile}
+      isAdmin={auth.isAdmin}
       isFavorite={isFavorite}
       selectedIngredientIds={selectedIngredientIds}
       onOpenIngredients={() => navigateTo("ingredients")}
+      onOpenAccount={() => navigateTo("auth")}
       onOpenAdmin={() => navigateTo("admin")}
       onOpenDiscover={() => navigateTo("discover")}
       onOpenRecipes={openRecipes}

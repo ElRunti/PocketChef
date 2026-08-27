@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { isSupabaseConfigured, supabase } from "../../lib/supabase.js";
 import { pantryIngredients } from "../../recipes/data/recipes.js";
 import StepEditor from "./StepEditor";
 import ImageUpload from "./ImageUpload.jsx";
@@ -75,104 +74,40 @@ function RecipeForm({ onSubmitRecipe }) {
         }
 
         setSaving(true);
-        let remoteRecipeId;
-        let syncWarning = false;
 
-        if (isSupabaseConfigured && supabase) {
-            try {
-                const {
-                    data: { user },
-                } = await supabase.auth.getUser();
+        try {
+            const result = await onSubmitRecipe({
+                title: title.trim(),
+                description: description.trim(),
+                categoryId,
+                time: `${Number(time)} min`,
+                difficulty,
+                image,
+                ingredientIds,
+                steps: steps.map((step) => step.text.trim()),
+                stepTimers: steps.map((step) =>
+                    step.hasTimer ? Number(step.timerMinutes) : null
+                ),
+            });
 
-                if (user) {
-                    const { data: recipe, error: recipeError } = await supabase
-                        .from("recipes")
-                        .insert({
-                            user_id: user.id,
-                            title: title.trim(),
-                            description: description.trim(),
-                            category_id: categoryId,
-                            time_minutes: Number(time),
-                            difficulty,
-                            image_url: image,
-                            rating: 0,
-                            status: "pending",
-                        })
-                        .select()
-                        .single();
-
-                    if (recipeError) {
-                        throw recipeError;
-                    }
-
-                    remoteRecipeId = recipe.id;
-
-                    const { error: ingredientsError } = await supabase
-                        .from("recipe_ingredients")
-                        .insert(
-                            ingredientIds.map((ingredientId) => ({
-                                recipe_id: recipe.id,
-                                ingredient_id: ingredientId,
-                            }))
-                        );
-
-                    if (ingredientsError) {
-                        throw ingredientsError;
-                    }
-
-                    const { error: stepsError } = await supabase
-                        .from("recipe_steps")
-                        .insert(
-                            steps.map((step, index) => ({
-                                recipe_id: recipe.id,
-                                step_number: index + 1,
-                                text: step.text.trim(),
-                                has_timer: step.hasTimer,
-                                timer_minutes: step.hasTimer
-                                    ? Number(step.timerMinutes)
-                                    : null,
-                            }))
-                        );
-
-                    if (stepsError) {
-                        throw stepsError;
-                    }
-                }
-            } catch (error) {
-                console.warn("La receta se guardara solo en este dispositivo:", error);
-                syncWarning = true;
-            }
+            setMessage(
+                result.synced
+                    ? "Receta enviada a Supabase para revision."
+                    : "Receta guardada localmente. Ejecuta la migracion para sincronizarla."
+            );
+            setTitle("");
+            setDescription("");
+            setCategoryId("");
+            setTime("");
+            setDifficulty("");
+            setIngredientIds([]);
+            setSteps(initialSteps);
+            setImage("");
+        } catch (error) {
+            setMessage(error.message || "No se pudo enviar la receta.");
+        } finally {
+            setSaving(false);
         }
-
-        onSubmitRecipe({
-            id: remoteRecipeId,
-            title: title.trim(),
-            description: description.trim(),
-            categoryId,
-            time: `${Number(time)} min`,
-            difficulty,
-            image,
-            ingredientIds,
-            steps: steps.map((step) => step.text.trim()),
-            stepTimers: steps.map((step) =>
-                step.hasTimer ? Number(step.timerMinutes) : null
-            ),
-        });
-
-        setMessage(
-            syncWarning
-                ? "Receta enviada a revision en este dispositivo."
-                : "Receta enviada. Un administrador la revisara antes de publicarla."
-        );
-        setTitle("");
-        setDescription("");
-        setCategoryId("");
-        setTime("");
-        setDifficulty("");
-        setIngredientIds([]);
-        setSteps(initialSteps);
-        setImage("");
-        setSaving(false);
     };
 
     const handleIngredientChange = (ingredientId) => {

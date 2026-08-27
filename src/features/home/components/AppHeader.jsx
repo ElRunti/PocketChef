@@ -1,6 +1,13 @@
-import { Bell, ChefHat, Sparkles } from "lucide-react";
+import { Bell, ChefHat, Sparkles, UserRound } from "lucide-react";
 
-export function AppHeader({ pendingCount, onOpenAdmin, onOpenDiscover }) {
+export function AppHeader({
+  currentProfile,
+  isAdmin,
+  pendingCount,
+  onOpenAccount,
+  onOpenAdmin,
+  onOpenDiscover,
+}) {
   return (
     <header className="app-header">
       <div className="brand">
@@ -8,7 +15,7 @@ export function AppHeader({ pendingCount, onOpenAdmin, onOpenDiscover }) {
           <ChefHat aria-hidden="true" size={24} strokeWidth={2.4} />
         </div>
         <div>
-          <p>Hola, equipo</p>
+          <p>Hola, {currentProfile?.name ?? "chef invitado"}</p>
           <h1>Pocket Chef</h1>
         </div>
       </div>
@@ -22,14 +29,24 @@ export function AppHeader({ pendingCount, onOpenAdmin, onOpenDiscover }) {
         >
           <Sparkles aria-hidden="true" size={20} />
         </button>
+        {isAdmin && (
+          <button
+            className="icon-button notification-button"
+            aria-label="Ver recetas pendientes"
+            onClick={onOpenAdmin}
+            type="button"
+          >
+            <Bell aria-hidden="true" size={21} />
+            <span>{pendingCount}</span>
+          </button>
+        )}
         <button
-          className="icon-button notification-button"
-          aria-label="Ver recetas pendientes"
-          onClick={onOpenAdmin}
+          className="icon-button"
+          aria-label={currentProfile ? "Ver mi cuenta" : "Iniciar sesion"}
+          onClick={onOpenAccount}
           type="button"
         >
-          <Bell aria-hidden="true" size={21} />
-          <span>{pendingCount}</span>
+          <UserRound aria-hidden="true" size={20} />
         </button>
       </div>
     </header>

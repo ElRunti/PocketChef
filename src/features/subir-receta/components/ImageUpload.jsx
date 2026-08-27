@@ -15,16 +15,20 @@ function ImageUpload({ image, setImage }) {
 
         setError("");
 
+        const setLocalPreview = () => {
+            const reader = new FileReader();
+            reader.onload = () => setImage(reader.result);
+            reader.onerror = () => setError("No se pudo leer la imagen.");
+            reader.readAsDataURL(file);
+        };
+
         if (file.size > 1_500_000) {
             setError("La imagen debe pesar menos de 1.5 MB.");
             return;
         }
 
         if (!isSupabaseConfigured || !supabase) {
-            const reader = new FileReader();
-            reader.onload = () => setImage(reader.result);
-            reader.onerror = () => setError("No se pudo leer la imagen.");
-            reader.readAsDataURL(file);
+            setLocalPreview();
             return;
         }
 
@@ -36,9 +40,7 @@ function ImageUpload({ image, setImage }) {
             } = await supabase.auth.getUser();
 
             if (!user) {
-                const reader = new FileReader();
-                reader.onload = () => setImage(reader.result);
-                reader.readAsDataURL(file);
+                setLocalPreview();
                 return;
             }
 
@@ -61,7 +63,8 @@ function ImageUpload({ image, setImage }) {
             setImage(data.publicUrl);
         } catch (error) {
             console.error("Error al subir imagen:", error);
-            setError("No se pudo subir la imagen.");
+            setLocalPreview();
+            setError("Vista previa local. Ejecuta la migracion para subirla.");
         } finally {
             setUploading(false);
         }

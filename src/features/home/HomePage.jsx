@@ -23,12 +23,15 @@ import { SearchPanel } from "./components/SearchPanel.jsx";
 
 export function HomePage({
   approvedRecipes,
+  currentProfile,
+  isAdmin,
   pendingRecipes,
   selectedIngredientIds,
   isFavorite,
   onToggleFavorite,
   onToggleIngredient,
   onOpenIngredients,
+  onOpenAccount,
   onOpenAdmin,
   onOpenDiscover,
   onOpenRecipes,
@@ -57,6 +60,9 @@ export function HomePage({
     <main className="app-shell screen-page">
       <div className="page-container">
         <AppHeader
+          currentProfile={currentProfile}
+          isAdmin={isAdmin}
+          onOpenAccount={onOpenAccount}
           onOpenAdmin={onOpenAdmin}
           onOpenDiscover={onOpenDiscover}
           pendingCount={pendingRecipes.length}
