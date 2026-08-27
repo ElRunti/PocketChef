@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { PlusCircle, ShieldCheck, Utensils } from "lucide-react";
+import { Refrigerator, Search, ShieldCheck, Timer, Utensils } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import {
   categories,
@@ -12,7 +12,6 @@ import {
 import { AppHeader } from "./components/AppHeader.jsx";
 import { CategoryTabs } from "./components/CategoryTabs.jsx";
 import { FeaturedRecipe } from "./components/FeaturedRecipe.jsx";
-import { GuidedModePreview } from "./components/GuidedModePreview.jsx";
 import { IngredientSelector } from "./components/IngredientSelector.jsx";
 import { RecipeCard } from "./components/RecipeCard.jsx";
 import { SearchPanel } from "./components/SearchPanel.jsx";
@@ -22,7 +21,7 @@ export function HomePage({
   onToggleIngredient,
   onOpenIngredients,
   onOpenRecipes,
-  onSelectRecipe,
+  onOpenRecipeDetail,
   onStartInteractive,
   activeView,
   navItems,
@@ -30,7 +29,6 @@ export function HomePage({
 }) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [activeStep, setActiveStep] = useState(0);
 
   const approvedRecipes = useMemo(() => getApprovedRecipes(), []);
   const pendingRecipes = useMemo(() => getPendingRecipes(), []);
@@ -46,18 +44,8 @@ export function HomePage({
     });
   }, [activeCategory, approvedRecipes, query, selectedIngredientIds]);
 
-  function handlePreviousStep() {
-    setActiveStep((currentStep) => Math.max(currentStep - 1, 0));
-  }
-
-  function handleNextStep() {
-    setActiveStep((currentStep) =>
-      Math.min(currentStep + 1, featuredRecipe.steps.length - 1),
-    );
-  }
-
   return (
-    <main className="app-shell">
+    <main className="app-shell screen-page">
       <div className="page-container">
         <AppHeader pendingCount={pendingRecipes.length} />
 
@@ -73,6 +61,23 @@ export function HomePage({
               matchLabel={`${selectedIngredientIds.length} ingredientes`}
               onStartCooking={() => onStartInteractive(featuredRecipe.id)}
             />
+            <section className="home-action-grid">
+              <button onClick={onOpenIngredients} type="button">
+                <Refrigerator aria-hidden="true" size={22} />
+                <strong>Ingredientes</strong>
+                <span>Arma tu despensa</span>
+              </button>
+              <button onClick={() => onOpenRecipes()} type="button">
+                <Search aria-hidden="true" size={22} />
+                <strong>Recetas</strong>
+                <span>Busca y filtra</span>
+              </button>
+              <button onClick={() => onStartInteractive(featuredRecipe.id)} type="button">
+                <Timer aria-hidden="true" size={22} />
+                <strong>Modo guiado</strong>
+                <span>Cocina paso a paso</span>
+              </button>
+            </section>
             <CategoryTabs
               activeCategory={activeCategory}
               categories={categories}
@@ -94,9 +99,9 @@ export function HomePage({
                 <span>compatibles</span>
               </div>
               <div className="summary-card">
-                <PlusCircle aria-hidden="true" size={20} />
-                <strong>Nueva</strong>
-                <span>receta</span>
+                <Refrigerator aria-hidden="true" size={20} />
+                <strong>{selectedIngredientIds.length}</strong>
+                <span>ingredientes</span>
               </div>
               <div className="summary-card">
                 <ShieldCheck aria-hidden="true" size={20} />
@@ -121,8 +126,7 @@ export function HomePage({
                       key={recipe.id}
                       recipe={recipe}
                       onSelectRecipe={() => {
-                        onSelectRecipe(recipe.id);
-                        onOpenRecipes(recipe.id);
+                        onOpenRecipeDetail(recipe.id);
                       }}
                       missingIngredients={countMissingIngredients(
                         recipe,
@@ -135,19 +139,12 @@ export function HomePage({
                     <strong>No hay recetas exactas</strong>
                     <p>
                       Quita un ingrediente o cambia la categoria para probar
-                      otra combinacion.
+                  otra combinacion.
                     </p>
                   </div>
                 )}
               </div>
             </section>
-
-            <GuidedModePreview
-              activeStep={activeStep}
-              steps={featuredRecipe.steps}
-              onNext={handleNextStep}
-              onPrevious={handlePreviousStep}
-            />
           </div>
         </div>
       </div>

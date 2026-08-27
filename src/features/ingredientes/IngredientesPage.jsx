@@ -23,7 +23,7 @@ export function IngredientesPage({
   } = useIngredientSelection(selectedIngredientIds);
 
   return (
-    <main className="app-shell">
+    <main className="app-shell screen-page">
       <div className="page-container pantry-page">
         <div className="section-heading page-title-row">
           <div>

@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
-import { RecipeDetail } from "./components/RecipeDetail.jsx";
 import { RecipeFilters } from "./components/RecipeFilters.jsx";
 import { RecipeResultCard } from "./components/RecipeResultCard.jsx";
 import { useRecipeFilters } from "./controllers/useRecipeFilters.js";
@@ -8,28 +6,18 @@ import { useRecipeFilters } from "./controllers/useRecipeFilters.js";
 export function RecipesPage({
   selectedIngredientIds,
   selectedRecipeId,
-  onSelectRecipe,
-  onStartInteractive,
+  onOpenRecipeDetail,
   activeView,
   navItems,
   onNavigate,
 }) {
-  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState([]);
   const { filteredRecipes, selectedRecipe, filters, actions } = useRecipeFilters(
     selectedIngredientIds,
     selectedRecipeId,
   );
 
-  function toggleFavorite(recipeId) {
-    setFavoriteRecipeIds((currentRecipeIds) =>
-      currentRecipeIds.includes(recipeId)
-        ? currentRecipeIds.filter((id) => id !== recipeId)
-        : [...currentRecipeIds, recipeId],
-    );
-  }
-
   return (
-    <main className="app-shell">
+    <main className="app-shell screen-page">
       <div className="page-container recipes-page">
         <div className="section-heading page-title-row">
           <div>
@@ -53,7 +41,7 @@ export function RecipesPage({
                   <RecipeResultCard
                     isActive={recipe.id === selectedRecipe?.id}
                     key={recipe.id}
-                    onSelectRecipe={onSelectRecipe}
+                    onSelectRecipe={onOpenRecipeDetail}
                     recipe={recipe}
                     selectedIngredientIds={selectedIngredientIds}
                   />
@@ -66,14 +54,6 @@ export function RecipesPage({
               )}
             </section>
           </div>
-
-          <RecipeDetail
-            isFavorite={favoriteRecipeIds.includes(selectedRecipe?.id)}
-            onStartInteractive={onStartInteractive}
-            onToggleFavorite={toggleFavorite}
-            recipe={selectedRecipe}
-            selectedIngredientIds={selectedIngredientIds}
-          />
         </div>
       </div>
 

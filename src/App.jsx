@@ -1,8 +1,10 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { flushSync } from "react-dom";
 import { Home, Refrigerator, Search, Timer } from "lucide-react";
 import { HomePage } from "./features/home/HomePage.jsx";
 import { IngredientesPage } from "./features/ingredientes/IngredientesPage.jsx";
 import { ModoInteractivoPage } from "./features/modo-interactivo/ModoInteractivoPage.jsx";
+import { RecipeDetailPage } from "./features/recipes/RecipeDetailPage.jsx";
 import { RecipesPage } from "./features/recipes/RecipesPage.jsx";
 import { getApprovedRecipes } from "./features/recipes/model/recipeModel.js";
 
@@ -23,10 +25,32 @@ export function App() {
   const [selectedRecipeId, setSelectedRecipeId] = useState(
     approvedRecipes[0]?.id ?? "",
   );
+  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState([]);
 
   const selectedRecipe =
     approvedRecipes.find((recipe) => recipe.id === selectedRecipeId) ??
     approvedRecipes[0];
+
+  const activeNavItemId = activeView === "recipe-detail" ? "recipes" : activeView;
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, [activeView]);
+
+  function updateScreen(updateState) {
+    if (document.startViewTransition) {
+      document.startViewTransition(() => {
+        flushSync(updateState);
+      });
+      return;
+    }
+
+    updateState();
+  }
+
+  function navigateTo(viewId) {
+    updateScreen(() => setActiveView(viewId));
+  }
 
   function toggleIngredient(ingredientId) {
     setSelectedIngredientIds((currentIngredients) =>
@@ -41,25 +65,47 @@ export function App() {
   }
 
   function openRecipes(recipeId) {
-    if (recipeId) {
-      setSelectedRecipeId(recipeId);
-    }
+    updateScreen(() => {
+      if (recipeId) {
+        setSelectedRecipeId(recipeId);
+      }
 
-    setActiveView("recipes");
+      setActiveView("recipes");
+    });
+  }
+
+  function openRecipeDetail(recipeId) {
+    updateScreen(() => {
+      if (recipeId) {
+        setSelectedRecipeId(recipeId);
+      }
+
+      setActiveView("recipe-detail");
+    });
   }
 
   function openInteractive(recipeId) {
-    if (recipeId) {
-      setSelectedRecipeId(recipeId);
-    }
+    updateScreen(() => {
+      if (recipeId) {
+        setSelectedRecipeId(recipeId);
+      }
 
-    setActiveView("interactive");
+      setActiveView("interactive");
+    });
+  }
+
+  function toggleFavorite(recipeId) {
+    setFavoriteRecipeIds((currentRecipeIds) =>
+      currentRecipeIds.includes(recipeId)
+        ? currentRecipeIds.filter((id) => id !== recipeId)
+        : [...currentRecipeIds, recipeId],
+    );
   }
 
   const sharedPageProps = {
-    activeView,
+    activeView: activeNavItemId,
     navItems,
-    onNavigate: setActiveView,
+    onNavigate: navigateTo,
   };
 
   if (activeView === "ingredients") {
@@ -69,7 +115,7 @@ export function App() {
         selectedIngredientIds={selectedIngredientIds}
         onClearIngredients={clearIngredients}
         onOpenRecipes={() => openRecipes()}
-        onSelectRecipe={openRecipes}
+        onSelectRecipe={openRecipeDetail}
         onToggleIngredient={toggleIngredient}
       />
     );
@@ -81,8 +127,21 @@ export function App() {
         {...sharedPageProps}
         selectedIngredientIds={selectedIngredientIds}
         selectedRecipeId={selectedRecipeId}
-        onSelectRecipe={setSelectedRecipeId}
+        onOpenRecipeDetail={openRecipeDetail}
+      />
+    );
+  }
+
+  if (activeView === "recipe-detail") {
+    return (
+      <RecipeDetailPage
+        {...sharedPageProps}
+        isFavorite={favoriteRecipeIds.includes(selectedRecipe?.id)}
+        selectedIngredientIds={selectedIngredientIds}
+        selectedRecipe={selectedRecipe}
+        onBack={() => openRecipes(selectedRecipe?.id)}
         onStartInteractive={openInteractive}
+        onToggleFavorite={toggleFavorite}
       />
     );
   }
@@ -93,7 +152,7 @@ export function App() {
         {...sharedPageProps}
         selectedIngredientIds={selectedIngredientIds}
         selectedRecipe={selectedRecipe}
-        onSelectRecipe={setSelectedRecipeId}
+        onBackToRecipe={() => openRecipeDetail(selectedRecipe?.id)}
       />
     );
   }
@@ -102,9 +161,9 @@ export function App() {
     <HomePage
       {...sharedPageProps}
       selectedIngredientIds={selectedIngredientIds}
-      onOpenIngredients={() => setActiveView("ingredients")}
+      onOpenIngredients={() => navigateTo("ingredients")}
       onOpenRecipes={openRecipes}
-      onSelectRecipe={setSelectedRecipeId}
+      onOpenRecipeDetail={openRecipeDetail}
       onStartInteractive={openInteractive}
       onToggleIngredient={toggleIngredient}
     />

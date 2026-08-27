@@ -1,9 +1,6 @@
-import { Check, Clock, Utensils } from "lucide-react";
+import { ArrowLeft, Check, Utensils } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
-import {
-  getApprovedRecipes,
-  getIngredientLabel,
-} from "../recipes/model/recipeModel.js";
+import { getIngredientLabel } from "../recipes/model/recipeModel.js";
 import { StepNavigator } from "./components/StepNavigator.jsx";
 import { StepTimer } from "./components/StepTimer.jsx";
 import { useInteractiveRecipe } from "./controllers/useInteractiveRecipe.js";
@@ -11,12 +8,11 @@ import { useInteractiveRecipe } from "./controllers/useInteractiveRecipe.js";
 export function ModoInteractivoPage({
   selectedRecipe,
   selectedIngredientIds,
-  onSelectRecipe,
+  onBackToRecipe,
   activeView,
   navItems,
   onNavigate,
 }) {
-  const approvedRecipes = getApprovedRecipes();
   const {
     activeStep,
     currentStep,
@@ -31,8 +27,13 @@ export function ModoInteractivoPage({
   } = useInteractiveRecipe(selectedRecipe);
 
   return (
-    <main className="app-shell">
+    <main className="app-shell screen-page">
       <div className="page-container interactive-page">
+        <button className="back-button" onClick={onBackToRecipe} type="button">
+          <ArrowLeft aria-hidden="true" size={18} />
+          Receta
+        </button>
+
         <div className="section-heading page-title-row">
           <div>
             <p>Modo interactivo</p>
@@ -44,39 +45,6 @@ export function ModoInteractivoPage({
         </div>
 
         <div className="interactive-layout">
-          <aside className="interactive-recipe-picker">
-            <div className="section-heading">
-              <div>
-                <p>Receta activa</p>
-                <h2>Elige que cocinar</h2>
-              </div>
-            </div>
-
-            <div className="interactive-recipe-list">
-              {approvedRecipes.map((recipe) => (
-                <button
-                  className={
-                    recipe.id === selectedRecipe.id
-                      ? "interactive-recipe-option active"
-                      : "interactive-recipe-option"
-                  }
-                  key={recipe.id}
-                  onClick={() => onSelectRecipe(recipe.id)}
-                  type="button"
-                >
-                  <img alt={recipe.title} src={recipe.image} />
-                  <span>
-                    <strong>{recipe.title}</strong>
-                    <small>
-                      <Clock aria-hidden="true" size={14} />
-                      {recipe.time}
-                    </small>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </aside>
-
           <section className="interactive-stage">
             <div className="interactive-image">
               <img alt={selectedRecipe.title} src={selectedRecipe.image} />
