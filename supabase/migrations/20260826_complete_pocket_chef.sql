@@ -80,6 +80,48 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
+create or replace function public.promote_user_to_admin(target_email text)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  target_user_id uuid;
+begin
+  select id
+  into target_user_id
+  from auth.users
+  where lower(email) = lower(trim(target_email));
+
+  if target_user_id is null then
+    raise exception
+      'No existe una cuenta de Supabase Auth con el correo %',
+      target_email;
+  end if;
+
+  insert into public.profiles (id, name, role)
+  select
+    id,
+    coalesce(
+      nullif(trim(raw_user_meta_data ->> 'name'), ''),
+      split_part(email, '@', 1)
+    ),
+    'admin'
+  from auth.users
+  where id = target_user_id
+  on conflict (id) do update
+  set
+    role = 'admin',
+    updated_at = now();
+
+  return target_user_id;
+end;
+$$;
+
+revoke all on function public.promote_user_to_admin(text)
+from public, anon, authenticated;
+
 insert into public.profiles (id, name)
 select
   id,
@@ -415,7 +457,7 @@ using (
 
 commit;
 
--- After registering the administrator account, promote it once from the SQL editor:
--- update public.profiles set role = 'admin' where id = (
---   select id from auth.users where email = 'admin@example.com'
--- );
+-- Supabase Auth manages passwords and auth.users. Create the administrator from
+-- Authentication > Users (or register it in Pocket Chef) with its email and a
+-- strong temporary password. Then promote that account once from the SQL editor:
+-- select public.promote_user_to_admin('admin@pocketchef.com');
