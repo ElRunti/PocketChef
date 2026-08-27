@@ -1,26 +1,34 @@
-import { Heart, Home, PlusCircle, Search, ShieldCheck, UserRound } from "lucide-react";
+import { Heart, Home, PlusCircle, Refrigerator, Search } from "lucide-react";
 
-const navItems = [
-  { label: "Inicio", icon: Home, page: "home" },
-  { label: "Buscar", icon: Search, page: "search" },
-  { label: "Subir", icon: PlusCircle, page: "upload" },
-  { label: "Admin", icon: ShieldCheck, page: "admin" },
-  { label: "Favoritos", icon: Heart, page: "favoritos" },
-  { label: "Perfil", icon: UserRound, page: "profile" },
+const defaultNavItems = [
+  { id: "home", label: "Inicio", icon: Home, active: true },
+  { id: "ingredients", label: "Despensa", icon: Refrigerator, active: false },
+  { id: "recipes", label: "Recetas", icon: Search, active: false },
+  { id: "upload", label: "Subir", icon: PlusCircle, active: false },
+  { id: "favorites", label: "Favoritos", icon: Heart, active: false },
 ];
 
-export function BottomNavigation({ activePage, onNavigate }) {
+export function BottomNavigation({
+  activeItemId = "home",
+  items = defaultNavItems,
+  onNavigate,
+}) {
   return (
-    <nav className="bottom-navigation" aria-label="Navegacion principal">
-      {navItems.map((item) => {
+    <nav
+      aria-label="Navegacion principal"
+      className="bottom-navigation"
+      style={{ "--nav-count": items.length }}
+    >
+      {items.map((item) => {
         const Icon = item.icon;
+        const isActive = activeItemId ? activeItemId === item.id : item.active;
 
         return (
           <button
-            className={item.page === activePage ? "active" : ""}
-            key={item.page}
+            className={isActive ? "active" : ""}
+            key={item.id}
+            onClick={() => onNavigate?.(item.id)}
             type="button"
-            onClick={() => onNavigate?.(item.page)}
           >
             <Icon aria-hidden="true" size={19} />
             <span>{item.label}</span>

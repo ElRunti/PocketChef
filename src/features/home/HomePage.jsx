@@ -1,91 +1,85 @@
 import { useMemo, useState } from "react";
-import { PlusCircle, ShieldCheck, Utensils } from "lucide-react";
+import { Refrigerator, Search, ShieldCheck, Timer, Utensils } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import {
   categories,
+  countMissingIngredients,
+  filterRecipes,
+  getApprovedRecipes,
+  getPendingRecipes,
   pantryIngredients,
-  recipes,
-} from "../recipes/data/recipes.js";
+} from "../recipes/model/recipeModel.js";
 import { AppHeader } from "./components/AppHeader.jsx";
 import { CategoryTabs } from "./components/CategoryTabs.jsx";
 import { FeaturedRecipe } from "./components/FeaturedRecipe.jsx";
-import { GuidedModePreview } from "./components/GuidedModePreview.jsx";
 import { IngredientSelector } from "./components/IngredientSelector.jsx";
 import { RecipeCard } from "./components/RecipeCard.jsx";
 import { SearchPanel } from "./components/SearchPanel.jsx";
-import { useFavorites } from "../favoritos/hooks/useFavorites.js";
 
-const initialIngredients = ["egg", "tomato", "cheese", "tortilla", "avocado"];
-
-function countMissingIngredients(recipe, selectedIngredientIds) {
-  if (selectedIngredientIds.length === 0) {
-    return 0;
-  }
-
-  return recipe.ingredientIds.filter(
-    (ingredientId) => !selectedIngredientIds.includes(ingredientId),
-  ).length;
-}
-
-export function HomePage({ onNavigate }) {
+export function HomePage({
+  selectedIngredientIds,
+  isFavorite,
+  onToggleFavorite,
+  onToggleIngredient,
+  onOpenIngredients,
+  onOpenRecipes,
+  onOpenRecipeDetail,
+  onStartInteractive,
+  activeView,
+  navItems,
+  onNavigate,
+}) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [selectedIngredientIds, setSelectedIngredientIds] =
-    useState(initialIngredients);
-  const [activeStep, setActiveStep] = useState(0);
-  const { toggleFavorite, isFavorite } = useFavorites();
 
-  const approvedRecipes = recipes.filter((recipe) => recipe.status === "approved");
-  const pendingRecipes = recipes.filter((recipe) => recipe.status === "pending");
+  const approvedRecipes = useMemo(() => getApprovedRecipes(), []);
+  const pendingRecipes = useMemo(() => getPendingRecipes(), []);
   const featuredRecipe = approvedRecipes[0];
 
   const filteredRecipes = useMemo(() => {
-    return approvedRecipes.filter((recipe) => {
-      const matchesSearch = recipe.title
-        .toLowerCase()
-        .includes(query.trim().toLowerCase());
-      const matchesCategory =
-        activeCategory === "all" || recipe.categoryId === activeCategory;
-      const matchesIngredients =
-        selectedIngredientIds.length === 0 ||
-        recipe.ingredientIds.every((ingredientId) =>
-          selectedIngredientIds.includes(ingredientId),
-        );
-
-      return matchesSearch && matchesCategory && matchesIngredients;
+    return filterRecipes({
+      recipeList: approvedRecipes,
+      query,
+      categoryId: activeCategory,
+      selectedIngredientIds,
+      onlyAvailable: true,
     });
   }, [activeCategory, approvedRecipes, query, selectedIngredientIds]);
 
-  function toggleIngredient(ingredientId) {
-    setSelectedIngredientIds((currentIngredients) =>
-      currentIngredients.includes(ingredientId)
-        ? currentIngredients.filter((id) => id !== ingredientId)
-        : [...currentIngredients, ingredientId],
-    );
-  }
-
-  function handlePreviousStep() {
-    setActiveStep((currentStep) => Math.max(currentStep - 1, 0));
-  }
-
-  function handleNextStep() {
-    setActiveStep((currentStep) =>
-      Math.min(currentStep + 1, featuredRecipe.steps.length - 1),
-    );
-  }
-
   return (
-    <main className="app-shell">
+    <main className="app-shell screen-page">
       <div className="page-container">
         <AppHeader pendingCount={pendingRecipes.length} />
 
         <div className="home-layout">
           <div>
-            <SearchPanel query={query} onQueryChange={setQuery} />
+            <SearchPanel
+              query={query}
+              onOpenFilters={() => onOpenRecipes()}
+              onQueryChange={setQuery}
+            />
             <FeaturedRecipe
               recipe={featuredRecipe}
               matchLabel={`${selectedIngredientIds.length} ingredientes`}
+              onStartCooking={() => onStartInteractive(featuredRecipe.id)}
             />
+            <section className="home-action-grid">
+              <button onClick={onOpenIngredients} type="button">
+                <Refrigerator aria-hidden="true" size={22} />
+                <strong>Ingredientes</strong>
+                <span>Arma tu despensa</span>
+              </button>
+              <button onClick={() => onOpenRecipes()} type="button">
+                <Search aria-hidden="true" size={22} />
+                <strong>Recetas</strong>
+                <span>Busca y filtra</span>
+              </button>
+              <button onClick={() => onStartInteractive(featuredRecipe.id)} type="button">
+                <Timer aria-hidden="true" size={22} />
+                <strong>Modo guiado</strong>
+                <span>Cocina paso a paso</span>
+              </button>
+            </section>
             <CategoryTabs
               activeCategory={activeCategory}
               categories={categories}
@@ -94,7 +88,8 @@ export function HomePage({ onNavigate }) {
             <IngredientSelector
               ingredients={pantryIngredients}
               selectedIngredientIds={selectedIngredientIds}
-              onToggleIngredient={toggleIngredient}
+              onSearchByIngredients={onOpenIngredients}
+              onToggleIngredient={onToggleIngredient}
             />
           </div>
 
@@ -106,9 +101,9 @@ export function HomePage({ onNavigate }) {
                 <span>compatibles</span>
               </div>
               <div className="summary-card">
-                <PlusCircle aria-hidden="true" size={20} />
-                <strong>Nueva</strong>
-                <span>receta</span>
+                <Refrigerator aria-hidden="true" size={20} />
+                <strong>{selectedIngredientIds.length}</strong>
+                <span>ingredientes</span>
               </div>
               <div className="summary-card">
                 <ShieldCheck aria-hidden="true" size={20} />
@@ -130,14 +125,15 @@ export function HomePage({ onNavigate }) {
                 {filteredRecipes.length > 0 ? (
                   filteredRecipes.map((recipe) => (
                     <RecipeCard
+                      isFavorite={isFavorite(recipe.id)}
                       key={recipe.id}
-                      recipe={recipe}
                       missingIngredients={countMissingIngredients(
                         recipe,
                         selectedIngredientIds,
                       )}
-                      isFavorite={isFavorite(recipe.id)}
-                      onToggleFavorite={toggleFavorite}
+                      onSelectRecipe={() => onOpenRecipeDetail(recipe.id)}
+                      onToggleFavorite={onToggleFavorite}
+                      recipe={recipe}
                     />
                   ))
                 ) : (
@@ -151,18 +147,15 @@ export function HomePage({ onNavigate }) {
                 )}
               </div>
             </section>
-
-            <GuidedModePreview
-              activeStep={activeStep}
-              steps={featuredRecipe.steps}
-              onNext={handleNextStep}
-              onPrevious={handlePreviousStep}
-            />
           </div>
         </div>
       </div>
 
-      <BottomNavigation activePage="home" onNavigate={onNavigate} />
+      <BottomNavigation
+        activeItemId={activeView}
+        items={navItems}
+        onNavigate={onNavigate}
+      />
     </main>
   );
 }

@@ -4,6 +4,7 @@ export const categories = [
   { id: "lunch", label: "Almuerzos" },
   { id: "dinner", label: "Cenas" },
   { id: "dessert", label: "Postres" },
+  { id: "drinks", label: "Bebidas" },
   { id: "quick", label: "Rapidas" },
 ];
 
@@ -18,6 +19,15 @@ export const pantryIngredients = [
   { id: "pasta", label: "Pasta" },
   { id: "banana", label: "Banano" },
   { id: "oats", label: "Avena" },
+  { id: "onion", label: "Cebolla" },
+  { id: "beans", label: "Frijoles" },
+  { id: "milk", label: "Leche" },
+  { id: "yogurt", label: "Yogurt" },
+  { id: "strawberry", label: "Fresa" },
+  { id: "lemon", label: "Limon" },
+  { id: "lettuce", label: "Lechuga" },
+  { id: "tuna", label: "Atun" },
+  { id: "bread", label: "Pan" },
 ];
 
 export const recipes = [
@@ -95,6 +105,82 @@ export const recipes = [
       "Agrega canela si tienes disponible.",
     ],
     rating: 4.5,
+    status: "approved",
+  },
+  {
+    id: "beans-quesadilla",
+    title: "Quesadilla con frijoles",
+    description: "Comida rapida, llenadora y lista con ingredientes de casa.",
+    categoryId: "quick",
+    time: "18 min",
+    difficulty: "Facil",
+    image:
+      "https://images.unsplash.com/photo-1613514785940-daed07799d9b?auto=format&fit=crop&w=900&q=80",
+    ingredientIds: ["tortilla", "cheese", "beans", "onion"],
+    steps: [
+      "Calienta los frijoles y sofrie un poco de cebolla.",
+      "Rellena la tortilla con queso y frijoles.",
+      "Dora por ambos lados hasta que el queso se derrita.",
+      "Corta y sirve caliente.",
+    ],
+    rating: 4.4,
+    status: "approved",
+  },
+  {
+    id: "tuna-toast",
+    title: "Tostadas de atun fresco",
+    description: "Almuerzo ligero con textura crujiente y sabor balanceado.",
+    categoryId: "lunch",
+    time: "12 min",
+    difficulty: "Facil",
+    image:
+      "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=900&q=80",
+    ingredientIds: ["tuna", "bread", "tomato", "lettuce", "lemon"],
+    steps: [
+      "Tuesta el pan hasta que quede crujiente.",
+      "Mezcla el atun con limon y tomate picado.",
+      "Agrega lechuga sobre el pan.",
+      "Sirve el atun encima y ajusta sal al gusto.",
+    ],
+    rating: 4.2,
+    status: "approved",
+  },
+  {
+    id: "strawberry-smoothie",
+    title: "Licuado de fresa y banano",
+    description: "Bebida cremosa para desayunar o refrescar la tarde.",
+    categoryId: "drinks",
+    time: "7 min",
+    difficulty: "Facil",
+    image:
+      "https://images.unsplash.com/photo-1553530666-ba11a7da3888?auto=format&fit=crop&w=900&q=80",
+    ingredientIds: ["banana", "strawberry", "milk", "yogurt"],
+    steps: [
+      "Lava las fresas y corta el banano.",
+      "Agrega fruta, leche y yogurt a la licuadora.",
+      "Licua hasta lograr una textura cremosa.",
+      "Sirve frio.",
+    ],
+    rating: 4.9,
+    status: "approved",
+  },
+  {
+    id: "yogurt-parfait",
+    title: "Parfait de yogurt con avena",
+    description: "Postre sencillo, fresco y facil de armar en capas.",
+    categoryId: "dessert",
+    time: "8 min",
+    difficulty: "Facil",
+    image:
+      "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=80",
+    ingredientIds: ["yogurt", "oats", "banana", "strawberry"],
+    steps: [
+      "Coloca una capa de yogurt en un vaso.",
+      "Agrega avena y fruta cortada.",
+      "Repite las capas hasta llenar el vaso.",
+      "Enfria unos minutos antes de servir.",
+    ],
+    rating: 4.7,
     status: "approved",
   },
   {

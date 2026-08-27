@@ -1,6 +1,6 @@
 import { ArrowRight, Clock, Flame, Star } from "lucide-react";
 
-export function FeaturedRecipe({ recipe, matchLabel }) {
+export function FeaturedRecipe({ recipe, matchLabel, onStartCooking }) {
   return (
     <section className="featured-recipe">
       <img alt={recipe.title} src={recipe.image} />
@@ -25,7 +25,7 @@ export function FeaturedRecipe({ recipe, matchLabel }) {
             <Clock aria-hidden="true" size={17} />
             {recipe.time}
           </span>
-          <button type="button">
+          <button onClick={onStartCooking} type="button">
             Cocinar
             <ArrowRight aria-hidden="true" size={18} />
           </button>
