@@ -2323,3 +2323,651 @@ button:active,
 .submit-recipe-button:active {
   transform: translateY(1px);
 }
+
+/* =========================================
+   COMUNIDAD, DESCUBRIMIENTO Y ADMIN
+========================================= */
+
+.header-actions,
+.segmented-control,
+.moderation-meta,
+.moderation-actions,
+.admin-editor-actions,
+.discovery-meta {
+  align-items: center;
+  display: flex;
+}
+
+.header-actions {
+  gap: 0.45rem;
+}
+
+.home-action-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.home-action-grid button:nth-child(4) {
+  animation-delay: 210ms;
+}
+
+.home-action-grid button:nth-child(4) svg {
+  color: #9a5a17;
+}
+
+.recipe-detail-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.recipe-detail-actions button {
+  min-width: 0;
+  padding: 0 0.65rem;
+}
+
+.recipe-detail-actions button:nth-child(n + 2) {
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--foreground);
+}
+
+.share-status,
+.editor-success {
+  background: var(--green-soft);
+  border: 1px solid #c9e3d4;
+  border-radius: 0.5rem;
+  color: var(--green);
+  font-size: 0.8rem;
+  font-weight: 850;
+  margin: 0.75rem 1rem 0;
+  padding: 0.7rem 0.8rem;
+}
+
+.community-recipe-header {
+  align-items: center;
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: 5.25rem minmax(0, 1fr);
+  margin-top: 1rem;
+}
+
+.community-recipe-header img {
+  aspect-ratio: 1;
+  border-radius: 0.5rem;
+  height: 5.25rem;
+  object-fit: cover;
+  width: 5.25rem;
+}
+
+.community-recipe-header p,
+.community-recipe-header h1,
+.community-recipe-header span {
+  margin: 0;
+}
+
+.community-recipe-header p {
+  color: var(--orange);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.community-recipe-header h1 {
+  font-size: 1.35rem;
+  line-height: 1.15;
+  margin-top: 0.2rem;
+}
+
+.community-recipe-header span {
+  color: var(--muted);
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 750;
+  margin-top: 0.35rem;
+}
+
+.rating-panel,
+.comments-panel,
+.interest-picker,
+.admin-editor-form {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1.5rem rgba(23, 32, 26, 0.06);
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.rating-panel {
+  display: grid;
+  gap: 1rem;
+}
+
+.rating-panel > div:first-child {
+  align-items: center;
+  display: flex;
+  gap: 0.8rem;
+}
+
+.rating-panel > div:first-child strong {
+  color: var(--orange);
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.rating-panel > div:first-child span,
+.rating-panel > div:last-child p {
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.rating-panel > div:first-child span {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.rating-panel > div:first-child svg {
+  color: #e8a11d;
+}
+
+.star-rating {
+  display: flex;
+  gap: 0.2rem;
+  margin-top: 0.35rem;
+}
+
+.star-rating button {
+  background: transparent;
+  border: 0;
+  color: #ccd4cf;
+  height: 2.5rem;
+  padding: 0;
+  transition: color 160ms ease, transform 160ms var(--motion-ease);
+  width: 2.5rem;
+}
+
+.star-rating button.active {
+  color: #e8a11d;
+  animation: selectedPop 260ms var(--motion-ease);
+}
+
+.comment-form {
+  align-items: flex-start;
+  background: #f8faf6;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-top: 1rem;
+  padding: 0.75rem;
+}
+
+.comment-form > svg {
+  color: var(--green);
+  margin-top: 0.5rem;
+}
+
+.comment-form textarea {
+  background: transparent;
+  border: 0;
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.86rem;
+  min-height: 4.5rem;
+  outline: 0;
+  resize: vertical;
+  width: 100%;
+}
+
+.comment-form button {
+  background: var(--green);
+  border: 0;
+  border-radius: 0.45rem;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 900;
+  grid-column: 2;
+  min-height: 2.5rem;
+  padding: 0 0.9rem;
+  width: fit-content;
+}
+
+.comment-list {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.comment-item {
+  align-items: start;
+  animation: cardIn 420ms var(--motion-ease) both;
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 2.25rem minmax(0, 1fr);
+}
+
+.comment-item > span {
+  background: var(--orange-soft);
+  border-radius: 50%;
+  color: var(--orange);
+  display: grid;
+  font-weight: 900;
+  height: 2.25rem;
+  place-items: center;
+  width: 2.25rem;
+}
+
+.comment-item header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.comment-item strong {
+  font-size: 0.86rem;
+}
+
+.comment-item small {
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.comment-item p {
+  color: #4d5f55;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  margin: 0.2rem 0 0;
+}
+
+.segmented-control {
+  background: #eaf0e8;
+  border-radius: 0.5rem;
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+.segmented-control button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 0.4rem;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 0.76rem;
+  font-weight: 850;
+  gap: 0.35rem;
+  justify-content: center;
+  min-height: 2.5rem;
+  min-width: 0;
+}
+
+.segmented-control button.active {
+  background: white;
+  box-shadow: 0 0.2rem 0.6rem rgba(23, 32, 26, 0.09);
+  color: var(--green);
+}
+
+.discovery-modes,
+.moderation-filters {
+  margin-top: 1rem;
+}
+
+.discovery-modes button {
+  flex: 1;
+}
+
+.moderation-filters {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.moderation-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.moderation-filters button {
+  flex: 0 0 auto;
+  padding: 0 0.85rem;
+}
+
+.interest-chip-list,
+.admin-ingredient-grid {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 0.9rem;
+}
+
+.interest-chip-list button,
+.admin-ingredient-grid label {
+  background: #f8faf6;
+  border: 1px solid var(--line);
+  border-radius: 0.45rem;
+  color: #4d5f55;
+  font-size: 0.78rem;
+  font-weight: 850;
+  min-height: 2.65rem;
+  padding: 0 0.65rem;
+}
+
+.interest-chip-list button.selected,
+.admin-ingredient-grid label.selected {
+  background: var(--green-soft);
+  border-color: #99c8b2;
+  color: var(--green);
+}
+
+.discovery-list,
+.moderation-list {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.discovery-recipe-card,
+.moderation-card {
+  animation: cardIn 460ms var(--motion-ease) both;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.45rem 1.2rem rgba(23, 32, 26, 0.06);
+  display: grid;
+  gap: 0;
+  grid-template-columns: 6.6rem minmax(0, 1fr);
+  min-width: 0;
+  overflow: hidden;
+}
+
+.discovery-recipe-card > img,
+.moderation-card > img {
+  height: 100%;
+  min-height: 9.5rem;
+  object-fit: cover;
+  width: 100%;
+}
+
+.discovery-recipe-card > div,
+.moderation-card-content {
+  min-width: 0;
+  padding: 0.8rem;
+}
+
+.discovery-reason,
+.status-badge {
+  border-radius: 0.35rem;
+  display: inline-flex;
+  font-size: 0.66rem;
+  font-weight: 900;
+  line-height: 1;
+  padding: 0.4rem 0.5rem;
+  text-transform: uppercase;
+}
+
+.discovery-reason {
+  background: var(--orange-soft);
+  color: #b84428;
+}
+
+.discovery-recipe-card small {
+  color: var(--muted);
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  margin-top: 0.5rem;
+}
+
+.discovery-recipe-card h3,
+.moderation-card h3 {
+  font-size: 0.94rem;
+  line-height: 1.2;
+  margin: 0.2rem 0 0;
+}
+
+.discovery-meta {
+  color: var(--muted);
+  flex-wrap: wrap;
+  font-size: 0.68rem;
+  font-weight: 800;
+  gap: 0.5rem;
+  margin-top: 0.45rem;
+}
+
+.discovery-meta span {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.discovery-meta span:last-child {
+  color: #9a5a17;
+}
+
+.discovery-recipe-card button {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--green);
+  display: inline-flex;
+  font-size: 0.75rem;
+  font-weight: 900;
+  gap: 0.25rem;
+  margin-top: 0.65rem;
+  padding: 0;
+}
+
+.admin-summary {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.admin-summary > div {
+  align-items: center;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0.75rem 0.35rem;
+  text-align: center;
+}
+
+.admin-summary svg {
+  color: var(--green);
+}
+
+.admin-summary > div:last-child svg {
+  color: #bd4337;
+}
+
+.admin-summary strong {
+  font-size: 1.25rem;
+  margin-top: 0.2rem;
+}
+
+.admin-summary span {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.moderation-card-content > header {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.moderation-card-content > header small {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.status-badge.pending {
+  background: #fff3d4;
+  color: #8a5a00;
+}
+
+.status-badge.approved {
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.status-badge.rejected {
+  background: #fdecea;
+  color: #a9372c;
+}
+
+.moderation-card-content > p {
+  color: var(--muted);
+  display: -webkit-box;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  margin: 0.35rem 0 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.moderation-meta {
+  color: var(--muted);
+  flex-wrap: wrap;
+  font-size: 0.66rem;
+  font-weight: 800;
+  gap: 0.4rem 0.7rem;
+  margin-top: 0.55rem;
+}
+
+.moderation-meta span {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.moderation-actions,
+.admin-editor-actions {
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.moderation-actions button,
+.admin-editor-actions button {
+  align-items: center;
+  border-radius: 0.4rem;
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 900;
+  gap: 0.25rem;
+  justify-content: center;
+  min-height: 2.35rem;
+  padding: 0 0.55rem;
+}
+
+button.secondary {
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--foreground);
+}
+
+button.approve {
+  background: var(--green);
+  border: 1px solid var(--green);
+  color: white;
+}
+
+button.reject {
+  background: white;
+  border: 1px solid #e5aaa5;
+  color: #a9372c;
+}
+
+.admin-editor-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.admin-editor-row {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.admin-ingredient-fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-ingredient-fieldset legend {
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.admin-ingredient-grid label {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.admin-ingredient-grid input {
+  accent-color: var(--green);
+}
+
+.editor-success {
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .home-action-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .rating-panel {
+    align-items: center;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .interest-chip-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-ingredient-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .admin-editor-row {
+    grid-template-columns: 1.5fr 0.7fr 1fr;
+  }
+
+  .discovery-list,
+  .moderation-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .home-action-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .page-title-row h1 {
+    font-size: 1.35rem;
+  }
+
+  .discovery-recipe-card,
+  .moderation-card {
+    grid-template-columns: 5.7rem minmax(0, 1fr);
+  }
+
+  .moderation-actions button {
+    flex: 1 1 calc(50% - 0.4rem);
+  }
+}

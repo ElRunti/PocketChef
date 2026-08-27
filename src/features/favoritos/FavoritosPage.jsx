@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
-import { recipes } from "../recipes/data/recipes.js";
 import { FavoriteRecipeCard } from "./components/FavoriteRecipeCard.jsx";
 
 export function FavoritosPage({
+  approvedRecipes,
   favoriteRecipeIds,
   onOpenRecipeDetail,
   onToggleFavorite,
@@ -12,8 +12,8 @@ export function FavoritosPage({
   onNavigate,
 }) {
   const favoriteRecipes = useMemo(() => {
-    return recipes.filter((recipe) => favoriteRecipeIds.includes(recipe.id));
-  }, [favoriteRecipeIds]);
+    return approvedRecipes.filter((recipe) => favoriteRecipeIds.includes(recipe.id));
+  }, [approvedRecipes, favoriteRecipeIds]);
 
   return (
     <main className="app-shell screen-page">

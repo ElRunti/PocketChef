@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   filterRecipes,
-  getApprovedRecipes,
   getRecipeById,
 } from "../model/recipeModel.js";
 
@@ -20,14 +19,16 @@ export const timeOptions = [
   { id: "30", label: "30 min" },
 ];
 
-export function useRecipeFilters(selectedIngredientIds, selectedRecipeId) {
+export function useRecipeFilters(
+  selectedIngredientIds,
+  selectedRecipeId,
+  approvedRecipes,
+) {
   const [query, setQuery] = useState("");
   const [categoryId, setCategoryId] = useState("all");
   const [difficulty, setDifficulty] = useState("all");
   const [maxTime, setMaxTime] = useState("all");
   const [onlyAvailable, setOnlyAvailable] = useState(true);
-
-  const approvedRecipes = useMemo(() => getApprovedRecipes(), []);
 
   const filteredRecipes = useMemo(
     () =>
@@ -53,7 +54,7 @@ export function useRecipeFilters(selectedIngredientIds, selectedRecipeId) {
 
   const selectedRecipe = useMemo(() => {
     return (
-      getRecipeById(selectedRecipeId) ??
+      getRecipeById(selectedRecipeId, approvedRecipes) ??
       filteredRecipes[0] ??
       approvedRecipes[0]
     );

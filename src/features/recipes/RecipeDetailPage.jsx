@@ -6,9 +6,13 @@ export function RecipeDetailPage({
   selectedRecipe,
   selectedIngredientIds,
   isFavorite,
+  communityRating,
   onBack,
+  onOpenCommunity,
+  onShareRecipe,
   onStartInteractive,
   onToggleFavorite,
+  shareStatus,
   activeView,
   navItems,
   onNavigate,
@@ -22,11 +26,15 @@ export function RecipeDetailPage({
         </button>
 
         <RecipeDetail
+          communityRating={communityRating}
           isFavorite={isFavorite}
           onStartInteractive={onStartInteractive}
+          onOpenCommunity={onOpenCommunity}
+          onShareRecipe={onShareRecipe}
           onToggleFavorite={onToggleFavorite}
           recipe={selectedRecipe}
           selectedIngredientIds={selectedIngredientIds}
+          shareStatus={shareStatus}
         />
       </div>
 

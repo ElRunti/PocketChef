@@ -1,6 +1,6 @@
-import { Bell, ChefHat } from "lucide-react";
+import { Bell, ChefHat, Sparkles } from "lucide-react";
 
-export function AppHeader({ pendingCount }) {
+export function AppHeader({ pendingCount, onOpenAdmin, onOpenDiscover }) {
   return (
     <header className="app-header">
       <div className="brand">
@@ -13,10 +13,25 @@ export function AppHeader({ pendingCount }) {
         </div>
       </div>
 
-      <button className="icon-button notification-button" aria-label="Ver recetas pendientes">
-        <Bell aria-hidden="true" size={21} />
-        <span>{pendingCount}</span>
-      </button>
+      <div className="header-actions">
+        <button
+          className="icon-button"
+          aria-label="Descubrir recetas para ti"
+          onClick={onOpenDiscover}
+          type="button"
+        >
+          <Sparkles aria-hidden="true" size={20} />
+        </button>
+        <button
+          className="icon-button notification-button"
+          aria-label="Ver recetas pendientes"
+          onClick={onOpenAdmin}
+          type="button"
+        >
+          <Bell aria-hidden="true" size={21} />
+          <span>{pendingCount}</span>
+        </button>
+      </div>
     </header>
   );
 }

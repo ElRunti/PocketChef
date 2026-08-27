@@ -1,4 +1,13 @@
-import { ArrowRight, Check, Clock, Heart, Star, Utensils } from "lucide-react";
+import {
+  ArrowRight,
+  Check,
+  Clock,
+  Heart,
+  MessageCircle,
+  Share2,
+  Star,
+  Utensils,
+} from "lucide-react";
 import {
   getCategoryLabel,
   getIngredientLabel,
@@ -8,7 +17,11 @@ export function RecipeDetail({
   recipe,
   selectedIngredientIds,
   isFavorite,
+  communityRating,
+  shareStatus,
   onToggleFavorite,
+  onOpenCommunity,
+  onShareRecipe,
   onStartInteractive,
 }) {
   if (!recipe) {
@@ -44,7 +57,17 @@ export function RecipeDetail({
           />
           {isFavorite ? "Guardada" : "Favorito"}
         </button>
+        <button onClick={() => onOpenCommunity(recipe.id)} type="button">
+          <MessageCircle aria-hidden="true" size={18} />
+          Opiniones
+        </button>
+        <button onClick={() => onShareRecipe(recipe)} type="button">
+          <Share2 aria-hidden="true" size={18} />
+          Compartir
+        </button>
       </div>
+
+      {shareStatus && <p className="share-status">{shareStatus}</p>}
 
       <div className="recipe-detail-stats">
         <span>
@@ -57,7 +80,7 @@ export function RecipeDetail({
         </span>
         <span>
           <Star aria-hidden="true" size={17} />
-          {recipe.rating}
+          {communityRating.average} ({communityRating.count})
         </span>
       </div>
 

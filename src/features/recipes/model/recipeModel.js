@@ -11,16 +11,16 @@ function normalizeText(value) {
   return value.trim().toLowerCase();
 }
 
-export function getApprovedRecipes() {
-  return recipes.filter((recipe) => recipe.status === approvedStatus);
+export function getApprovedRecipes(recipeList = recipes) {
+  return recipeList.filter((recipe) => recipe.status === approvedStatus);
 }
 
-export function getPendingRecipes() {
-  return recipes.filter((recipe) => recipe.status === pendingStatus);
+export function getPendingRecipes(recipeList = recipes) {
+  return recipeList.filter((recipe) => recipe.status === pendingStatus);
 }
 
-export function getRecipeById(recipeId) {
-  return recipes.find((recipe) => recipe.id === recipeId);
+export function getRecipeById(recipeId, recipeList = recipes) {
+  return recipeList.find((recipe) => recipe.id === recipeId);
 }
 
 export function getDefaultRecipe() {
@@ -108,8 +108,11 @@ export function filterRecipes({
   });
 }
 
-export function getRecommendedRecipes(selectedIngredientIds) {
-  return getApprovedRecipes()
+export function getRecommendedRecipes(
+  selectedIngredientIds,
+  recipeList = getApprovedRecipes(),
+) {
+  return getApprovedRecipes(recipeList)
     .map((recipe) => ({
       ...recipe,
       missingCount: countMissingIngredients(recipe, selectedIngredientIds),
@@ -118,6 +121,47 @@ export function getRecommendedRecipes(selectedIngredientIds) {
     .sort((firstRecipe, secondRecipe) => {
       if (firstRecipe.missingCount !== secondRecipe.missingCount) {
         return firstRecipe.missingCount - secondRecipe.missingCount;
+      }
+
+      return secondRecipe.rating - firstRecipe.rating;
+    });
+}
+
+export function getPopularRecipes(recipeList = getApprovedRecipes()) {
+  return getApprovedRecipes(recipeList)
+    .map((recipe) => ({
+      ...recipe,
+      popularityScore:
+        recipe.rating * Math.max(recipe.ratingCount ?? 24, 1),
+    }))
+    .sort(
+      (firstRecipe, secondRecipe) =>
+        secondRecipe.popularityScore - firstRecipe.popularityScore,
+    );
+}
+
+export function getRecipesByInterests(
+  interestCategoryIds,
+  selectedIngredientIds,
+  recipeList = getApprovedRecipes(),
+) {
+  const approvedRecipes = getApprovedRecipes(recipeList);
+  const hasInterests = interestCategoryIds.length > 0;
+
+  return approvedRecipes
+    .map((recipe) => ({
+      ...recipe,
+      matchPercent: getRecipeMatchPercent(recipe, selectedIngredientIds),
+      interestMatch:
+        !hasInterests || interestCategoryIds.includes(recipe.categoryId),
+    }))
+    .sort((firstRecipe, secondRecipe) => {
+      if (firstRecipe.interestMatch !== secondRecipe.interestMatch) {
+        return Number(secondRecipe.interestMatch) - Number(firstRecipe.interestMatch);
+      }
+
+      if (firstRecipe.matchPercent !== secondRecipe.matchPercent) {
+        return secondRecipe.matchPercent - firstRecipe.matchPercent;
       }
 
       return secondRecipe.rating - firstRecipe.rating;

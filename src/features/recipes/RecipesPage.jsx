@@ -4,6 +4,7 @@ import { RecipeResultCard } from "./components/RecipeResultCard.jsx";
 import { useRecipeFilters } from "./controllers/useRecipeFilters.js";
 
 export function RecipesPage({
+  approvedRecipes,
   selectedIngredientIds,
   selectedRecipeId,
   onOpenRecipeDetail,
@@ -11,10 +12,12 @@ export function RecipesPage({
   navItems,
   onNavigate,
 }) {
-  const { filteredRecipes, selectedRecipe, filters, actions } = useRecipeFilters(
-    selectedIngredientIds,
-    selectedRecipeId,
-  );
+  const { filteredRecipes, selectedRecipe, filters, actions } =
+    useRecipeFilters(
+      selectedIngredientIds,
+      selectedRecipeId,
+      approvedRecipes,
+    );
 
   return (
     <main className="app-shell screen-page">

@@ -13,7 +13,7 @@ const initialSteps = [
     },
 ];
 
-function RecipeForm() {
+function RecipeForm({ onSubmitRecipe }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [categoryId, setCategoryId] = useState("");
@@ -74,138 +74,105 @@ function RecipeForm() {
             return;
         }
 
-        if (!isSupabaseConfigured || !supabase) {
-            setMessage(
-                "Configura Supabase en el archivo .env antes de enviar recetas."
-            );
-            return;
-        }
-
         setSaving(true);
+        let remoteRecipeId;
+        let syncWarning = false;
 
-        try {
-            // =====================================================
-            // 1. Obtener usuario autenticado
-            // =====================================================
+        if (isSupabaseConfigured && supabase) {
+            try {
+                const {
+                    data: { user },
+                } = await supabase.auth.getUser();
 
-            const {
-                data: { user },
-                error: userError,
-            } = await supabase.auth.getUser();
+                if (user) {
+                    const { data: recipe, error: recipeError } = await supabase
+                        .from("recipes")
+                        .insert({
+                            user_id: user.id,
+                            title: title.trim(),
+                            description: description.trim(),
+                            category_id: categoryId,
+                            time_minutes: Number(time),
+                            difficulty,
+                            image_url: image,
+                            rating: 0,
+                            status: "pending",
+                        })
+                        .select()
+                        .single();
 
-            if (userError || !user) {
-                setMessage(
-                    "No hay un usuario autenticado."
-                );
-                return;
+                    if (recipeError) {
+                        throw recipeError;
+                    }
+
+                    remoteRecipeId = recipe.id;
+
+                    const { error: ingredientsError } = await supabase
+                        .from("recipe_ingredients")
+                        .insert(
+                            ingredientIds.map((ingredientId) => ({
+                                recipe_id: recipe.id,
+                                ingredient_id: ingredientId,
+                            }))
+                        );
+
+                    if (ingredientsError) {
+                        throw ingredientsError;
+                    }
+
+                    const { error: stepsError } = await supabase
+                        .from("recipe_steps")
+                        .insert(
+                            steps.map((step, index) => ({
+                                recipe_id: recipe.id,
+                                step_number: index + 1,
+                                text: step.text.trim(),
+                                has_timer: step.hasTimer,
+                                timer_minutes: step.hasTimer
+                                    ? Number(step.timerMinutes)
+                                    : null,
+                            }))
+                        );
+
+                    if (stepsError) {
+                        throw stepsError;
+                    }
+                }
+            } catch (error) {
+                console.warn("La receta se guardara solo en este dispositivo:", error);
+                syncWarning = true;
             }
-
-            // =====================================================
-            // 2. Crear receta
-            // =====================================================
-
-            const { data: recipe, error: recipeError } =
-                await supabase
-                    .from("recipes")
-                    .insert({
-                        user_id: user.id,
-                        title: title.trim(),
-                        description: description.trim(),
-                        category_id: categoryId,
-                        time_minutes: Number(time),
-                        difficulty: difficulty,
-                        image_url: image,
-                        rating: 0,
-                        status: "pending",
-                    })
-                    .select()
-                    .single();
-
-            if (recipeError) {
-                throw recipeError;
-            }
-
-            // =====================================================
-            // 3. Guardar ingredientes
-            // =====================================================
-
-            const recipeIngredients = ingredientIds.map(
-                (ingredientId) => ({
-                    recipe_id: recipe.id,
-                    ingredient_id: ingredientId,
-                })
-            );
-
-            const { error: ingredientsError } =
-                await supabase
-                    .from("recipe_ingredients")
-                    .insert(recipeIngredients);
-
-            if (ingredientsError) {
-                throw ingredientsError;
-            }
-
-            // =====================================================
-            // 4. Guardar pasos
-            // =====================================================
-
-            const recipeSteps = steps.map((step, index) => ({
-                recipe_id: recipe.id,
-                step_number: index + 1,
-                text: step.text.trim(),
-                has_timer: step.hasTimer,
-                timer_minutes: step.hasTimer
-                    ? Number(step.timerMinutes)
-                    : null,
-            }));
-
-            const { error: stepsError } =
-                await supabase
-                    .from("recipe_steps")
-                    .insert(recipeSteps);
-
-            if (stepsError) {
-                throw stepsError;
-            }
-
-            // =====================================================
-            // 5. Éxito
-            // =====================================================
-
-            console.log("Receta guardada:", recipe);
-
-            setMessage(
-                "¡Receta enviada! Un administrador la revisará antes de publicarla."
-            );
-
-            // Limpiar formulario
-            setTitle("");
-            setDescription("");
-            setCategoryId("");
-            setTime("");
-            setDifficulty("");
-            setIngredientIds([]);
-            setSteps([
-                {
-                    text: "",
-                    hasTimer: false,
-                    timerMinutes: null,
-                },
-            ]);
-            setImage("");
-
-        } catch (error) {
-            console.error(
-                "Error al guardar la receta:",
-                error
-            );
-
-            setMessage(
-                "Ocurrió un error al guardar la receta."
-            );
-        } finally {
-            setSaving(false);
         }
+
+        onSubmitRecipe({
+            id: remoteRecipeId,
+            title: title.trim(),
+            description: description.trim(),
+            categoryId,
+            time: `${Number(time)} min`,
+            difficulty,
+            image,
+            ingredientIds,
+            steps: steps.map((step) => step.text.trim()),
+            stepTimers: steps.map((step) =>
+                step.hasTimer ? Number(step.timerMinutes) : null
+            ),
+        });
+
+        setMessage(
+            syncWarning
+                ? "Receta enviada a revision en este dispositivo."
+                : "Receta enviada. Un administrador la revisara antes de publicarla."
+        );
+        setTitle("");
+        setDescription("");
+        setCategoryId("");
+        setTime("");
+        setDifficulty("");
+        setIngredientIds([]);
+        setSteps(initialSteps);
+        setImage("");
+        setSaving(false);
     };
 
     const handleIngredientChange = (ingredientId) => {
@@ -317,6 +284,10 @@ function RecipeForm() {
                                 Postres
                             </option>
 
+                            <option value="drinks">
+                                Bebidas
+                            </option>
+
                             <option value="quick">
                                 Rápidas
                             </option>
@@ -339,15 +310,15 @@ function RecipeForm() {
                                 Selecciona la dificultad
                             </option>
 
-                            <option value="easy">
+                            <option value="Facil">
                                 Fácil
                             </option>
 
-                            <option value="medium">
+                            <option value="Media">
                                 Media
                             </option>
 
-                            <option value="hard">
+                            <option value="Dificil">
                                 Difícil
                             </option>
                         </select>

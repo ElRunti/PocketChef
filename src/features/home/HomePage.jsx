@@ -1,12 +1,17 @@
 import { useMemo, useState } from "react";
-import { Refrigerator, Search, ShieldCheck, Timer, Utensils } from "lucide-react";
+import {
+  Refrigerator,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  Timer,
+  Utensils,
+} from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import {
   categories,
   countMissingIngredients,
   filterRecipes,
-  getApprovedRecipes,
-  getPendingRecipes,
   pantryIngredients,
 } from "../recipes/model/recipeModel.js";
 import { AppHeader } from "./components/AppHeader.jsx";
@@ -17,11 +22,15 @@ import { RecipeCard } from "./components/RecipeCard.jsx";
 import { SearchPanel } from "./components/SearchPanel.jsx";
 
 export function HomePage({
+  approvedRecipes,
+  pendingRecipes,
   selectedIngredientIds,
   isFavorite,
   onToggleFavorite,
   onToggleIngredient,
   onOpenIngredients,
+  onOpenAdmin,
+  onOpenDiscover,
   onOpenRecipes,
   onOpenRecipeDetail,
   onStartInteractive,
@@ -32,8 +41,6 @@ export function HomePage({
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
 
-  const approvedRecipes = useMemo(() => getApprovedRecipes(), []);
-  const pendingRecipes = useMemo(() => getPendingRecipes(), []);
   const featuredRecipe = approvedRecipes[0];
 
   const filteredRecipes = useMemo(() => {
@@ -49,7 +56,11 @@ export function HomePage({
   return (
     <main className="app-shell screen-page">
       <div className="page-container">
-        <AppHeader pendingCount={pendingRecipes.length} />
+        <AppHeader
+          onOpenAdmin={onOpenAdmin}
+          onOpenDiscover={onOpenDiscover}
+          pendingCount={pendingRecipes.length}
+        />
 
         <div className="home-layout">
           <div>
@@ -78,6 +89,11 @@ export function HomePage({
                 <Timer aria-hidden="true" size={22} />
                 <strong>Modo guiado</strong>
                 <span>Cocina paso a paso</span>
+              </button>
+              <button onClick={onOpenDiscover} type="button">
+                <Sparkles aria-hidden="true" size={22} />
+                <strong>Descubre</strong>
+                <span>Para ti y populares</span>
               </button>
             </section>
             <CategoryTabs

@@ -5,6 +5,7 @@ import { RecommendedRecipeStrip } from "./components/RecommendedRecipeStrip.jsx"
 import { useIngredientSelection } from "./controllers/useIngredientSelection.js";
 
 export function IngredientesPage({
+  approvedRecipes,
   selectedIngredientIds,
   onToggleIngredient,
   onClearIngredients,
@@ -20,7 +21,7 @@ export function IngredientesPage({
     selectedIngredientLabels,
     recommendedRecipes,
     pantryProgress,
-  } = useIngredientSelection(selectedIngredientIds);
+  } = useIngredientSelection(selectedIngredientIds, approvedRecipes);
 
   return (
     <main className="app-shell screen-page">

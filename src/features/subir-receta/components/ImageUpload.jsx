@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ImagePlus } from "lucide-react";
 import { isSupabaseConfigured, supabase } from "../../lib/supabase.js";
 
 function ImageUpload({ image, setImage }) {
@@ -14,8 +15,16 @@ function ImageUpload({ image, setImage }) {
 
         setError("");
 
+        if (file.size > 1_500_000) {
+            setError("La imagen debe pesar menos de 1.5 MB.");
+            return;
+        }
+
         if (!isSupabaseConfigured || !supabase) {
-            setError("Configura Supabase en el archivo .env para subir imagenes.");
+            const reader = new FileReader();
+            reader.onload = () => setImage(reader.result);
+            reader.onerror = () => setError("No se pudo leer la imagen.");
+            reader.readAsDataURL(file);
             return;
         }
 
@@ -27,7 +36,9 @@ function ImageUpload({ image, setImage }) {
             } = await supabase.auth.getUser();
 
             if (!user) {
-                setError("Debes iniciar sesión para subir una imagen.");
+                const reader = new FileReader();
+                reader.onload = () => setImage(reader.result);
+                reader.readAsDataURL(file);
                 return;
             }
 
@@ -57,11 +68,7 @@ function ImageUpload({ image, setImage }) {
     };
 
     return (
-        <div>
-            <label htmlFor="image">
-                Imagen de la receta
-            </label>
-
+        <div className="image-upload">
             <input
                 type="file"
                 id="image"
@@ -69,6 +76,15 @@ function ImageUpload({ image, setImage }) {
                 onChange={handleImageChange}
                 disabled={uploading}
             />
+
+            <label className="image-upload-button" htmlFor="image">
+                <ImagePlus aria-hidden="true" size={19} />
+                {image ? "Cambiar imagen" : "Elegir imagen"}
+            </label>
+
+            <p className="image-upload-hint">
+                JPG, PNG o WEBP de hasta 1.5 MB
+            </p>
 
             {uploading && (
                 <p>Subiendo imagen...</p>
@@ -79,7 +95,7 @@ function ImageUpload({ image, setImage }) {
             )}
 
             {image && (
-                <div>
+                <div className="image-preview">
                     <p>Vista previa:</p>
 
                     <img

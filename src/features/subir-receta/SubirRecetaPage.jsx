@@ -1,7 +1,7 @@
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import RecipeForm from "./components/RecipeForm.jsx";
 
-function SubirRecetaPage({ activeView, navItems, onNavigate }) {
+function SubirRecetaPage({ activeView, navItems, onNavigate, onSubmitRecipe }) {
   return (
     <main className="app-shell screen-page">
       <div className="page-container recipe-upload-page">
@@ -14,7 +14,7 @@ function SubirRecetaPage({ activeView, navItems, onNavigate }) {
           <span>Nueva receta</span>
         </div>
 
-        <RecipeForm />
+        <RecipeForm onSubmitRecipe={onSubmitRecipe} />
       </div>
 
       <BottomNavigation
