@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { HomePage } from "./features/home/HomePage.jsx";
-import { FavoritosPage } from "./features/favoritos/FavoritosPage.jsx";
+import LoginPage from "./features/login/LoginPage.jsx";
+import RegisterPage from "./features/login/RegisterPage.jsx";
 
 export function App() {
-  const [activePage, setActivePage] = useState("home");
+  const [activePage, setActivePage] = useState("login");
 
-  if (activePage === "favoritos") {
-    return <FavoritosPage onNavigate={setActivePage} />;
+  if (activePage === "login") {
+    return <LoginPage onLogin={() => setActivePage("home")} onNavigate={setActivePage} />;
+  }
+
+  if (activePage === "register") {
+    return <RegisterPage onNavigate={setActivePage} />;
   }
 
   return <HomePage onNavigate={setActivePage} />;

@@ -10,13 +10,14 @@
     "lint": "eslint . --ignore-pattern dist --ignore-pattern node_modules --ignore-pattern work --ignore-pattern outputs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
+    "lucide-react": "^0.468.0",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "lucide-react": "^0.468.0"
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^5.0.0",
     "@eslint/js": "^9.33.0",
+    "@vitejs/plugin-react": "^5.0.0",
     "eslint": "^9.33.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
