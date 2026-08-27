@@ -7,7 +7,12 @@ const statusLabels = {
   rejected: "Rechazada",
 };
 
-export function ModerationRecipeCard({ recipe, onEdit, onModerate }) {
+export function ModerationRecipeCard({
+  categories,
+  recipe,
+  onEdit,
+  onModerate,
+}) {
   return (
     <article className="moderation-card">
       <img alt={recipe.title} src={recipe.image} />
@@ -16,7 +21,7 @@ export function ModerationRecipeCard({ recipe, onEdit, onModerate }) {
           <span className={`status-badge ${recipe.status}`}>
             {statusLabels[recipe.status]}
           </span>
-          <small>{getCategoryLabel(recipe.categoryId)}</small>
+          <small>{getCategoryLabel(recipe.categoryId, categories)}</small>
         </header>
         <h3>{recipe.title}</h3>
         <p>{recipe.description}</p>

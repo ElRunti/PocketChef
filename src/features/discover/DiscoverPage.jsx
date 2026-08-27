@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, Flame, Sparkles } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
-import { categories } from "../recipes/data/recipes.js";
 import {
   getPopularRecipes,
   getRecipesByInterests,
@@ -11,7 +10,9 @@ import { useFoodInterests } from "./hooks/useFoodInterests.js";
 
 export function DiscoverPage({
   approvedRecipes,
+  categories,
   selectedIngredientIds,
+  user,
   getRecipeRating,
   onBack,
   onOpenRecipe,
@@ -20,7 +21,18 @@ export function DiscoverPage({
   onNavigate,
 }) {
   const [activeMode, setActiveMode] = useState("for-you");
-  const { interestCategoryIds, toggleInterest } = useFoodInterests();
+  const [interestMessage, setInterestMessage] = useState("");
+  const { interestCategoryIds, toggleInterest } = useFoodInterests(user);
+
+  async function handleToggleInterest(categoryId) {
+    setInterestMessage("");
+
+    try {
+      await toggleInterest(categoryId);
+    } catch (error) {
+      setInterestMessage(error.message || "No se pudo guardar el interes.");
+    }
+  }
 
   const recommendations = useMemo(
     () =>
@@ -81,8 +93,9 @@ export function DiscoverPage({
                   <button
                     aria-pressed={selected}
                     className={selected ? "selected" : ""}
+                    disabled={!user}
                     key={category.id}
-                    onClick={() => toggleInterest(category.id)}
+                    onClick={() => handleToggleInterest(category.id)}
                     type="button"
                   >
                     {category.label}
@@ -90,6 +103,14 @@ export function DiscoverPage({
                 );
               })}
           </div>
+          {!user && (
+            <p className="auth-access-message">
+              Inicia sesion para guardar tus intereses.
+            </p>
+          )}
+          {interestMessage && (
+            <p className="auth-message">{interestMessage}</p>
+          )}
         </section>
 
         <div className="segmented-control discovery-modes" role="tablist">
@@ -116,21 +137,29 @@ export function DiscoverPage({
         </div>
 
         <section className="discovery-list">
-          {visibleRecipes.map((recipe, index) => (
-            <DiscoveryRecipeCard
-              key={recipe.id}
-              onOpenRecipe={onOpenRecipe}
-              rating={getRecipeRating(recipe)}
-              reason={
-                activeMode === "popular"
-                  ? `#${index + 1} entre la comunidad`
-                  : recipe.interestMatch
-                    ? `${recipe.matchPercent}% compatible contigo`
-                    : "Nueva opcion para descubrir"
-              }
-              recipe={recipe}
-            />
-          ))}
+          {visibleRecipes.length > 0 ? (
+            visibleRecipes.map((recipe, index) => (
+              <DiscoveryRecipeCard
+                categories={categories}
+                key={recipe.id}
+                onOpenRecipe={onOpenRecipe}
+                rating={getRecipeRating(recipe)}
+                reason={
+                  activeMode === "popular"
+                    ? `#${index + 1} entre la comunidad`
+                    : recipe.interestMatch
+                      ? `${recipe.matchPercent}% compatible contigo`
+                      : "Nueva opcion para descubrir"
+                }
+                recipe={recipe}
+              />
+            ))
+          ) : (
+            <div className="empty-state">
+              <strong>No hay recetas para mostrar</strong>
+              <p>Las recetas aprobadas en Supabase apareceran aqui.</p>
+            </div>
+          )}
         </section>
       </div>
 

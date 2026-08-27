@@ -6,6 +6,7 @@ import { StepTimer } from "./components/StepTimer.jsx";
 import { useInteractiveRecipe } from "./controllers/useInteractiveRecipe.js";
 
 export function ModoInteractivoPage({
+  pantryIngredients,
   selectedRecipe,
   selectedIngredientIds,
   onBackToRecipe,
@@ -95,7 +96,7 @@ export function ModoInteractivoPage({
                   return (
                     <li className={isAvailable ? "ready" : ""} key={ingredientId}>
                       <Check aria-hidden="true" size={15} />
-                      {getIngredientLabel(ingredientId)}
+                      {getIngredientLabel(ingredientId, pantryIngredients)}
                     </li>
                   );
                 })}

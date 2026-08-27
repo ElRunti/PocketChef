@@ -6,6 +6,7 @@ import {
 } from "../model/recipeModel.js";
 
 export function RecipeResultCard({
+  categories,
   recipe,
   selectedIngredientIds,
   isActive,
@@ -24,7 +25,7 @@ export function RecipeResultCard({
     >
       <img alt={recipe.title} src={recipe.image} />
       <span className="recipe-result-copy">
-        <small>{getCategoryLabel(recipe.categoryId)}</small>
+        <small>{getCategoryLabel(recipe.categoryId, categories)}</small>
         <strong>{recipe.title}</strong>
         <em>{matchLabel}</em>
       </span>

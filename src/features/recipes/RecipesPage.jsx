@@ -5,6 +5,8 @@ import { useRecipeFilters } from "./controllers/useRecipeFilters.js";
 
 export function RecipesPage({
   approvedRecipes,
+  categories,
+  pantryIngredients,
   selectedIngredientIds,
   selectedRecipeId,
   onOpenRecipeDetail,
@@ -33,8 +35,10 @@ export function RecipesPage({
         <div className="recipes-layout">
           <div className="recipes-sidebar">
             <RecipeFilters
+              categories={categories}
               filters={filters}
               actions={actions}
+              pantryIngredients={pantryIngredients}
               selectedIngredientIds={selectedIngredientIds}
             />
 
@@ -42,6 +46,7 @@ export function RecipesPage({
               {filteredRecipes.length > 0 ? (
                 filteredRecipes.map((recipe) => (
                   <RecipeResultCard
+                    categories={categories}
                     isActive={recipe.id === selectedRecipe?.id}
                     key={recipe.id}
                     onSelectRecipe={onOpenRecipeDetail}

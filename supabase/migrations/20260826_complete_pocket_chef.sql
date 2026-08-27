@@ -240,6 +240,13 @@ create table if not exists public.favorites (
   primary key (user_id, recipe_id)
 );
 
+create table if not exists public.profile_interests (
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  category_id text not null references public.categories(id) on delete cascade,
+  created_at timestamp with time zone not null default now(),
+  primary key (user_id, category_id)
+);
+
 create table if not exists public.recipe_ratings (
   user_id uuid not null references public.profiles(id) on delete cascade,
   recipe_id uuid not null references public.recipes(id) on delete cascade,
@@ -267,16 +274,24 @@ create index if not exists recipe_comments_recipe_id_created_at_idx
   on public.recipe_comments(recipe_id, created_at desc);
 
 alter table public.favorites enable row level security;
+alter table public.profile_interests enable row level security;
 alter table public.recipe_ratings enable row level security;
 alter table public.recipe_comments enable row level security;
 
 grant select, insert, delete on public.favorites to authenticated;
+grant select, insert, delete on public.profile_interests to authenticated;
 grant select, insert, update, delete on public.recipe_ratings to authenticated;
 grant select on public.recipe_comments to anon, authenticated;
 grant insert, update, delete on public.recipe_comments to authenticated;
 
 drop policy if exists favorites_manage_own on public.favorites;
 create policy favorites_manage_own on public.favorites
+for all to authenticated
+using (user_id = auth.uid())
+with check (user_id = auth.uid());
+
+drop policy if exists profile_interests_manage_own on public.profile_interests;
+create policy profile_interests_manage_own on public.profile_interests
 for all to authenticated
 using (user_id = auth.uid())
 with check (user_id = auth.uid());

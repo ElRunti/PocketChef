@@ -14,6 +14,7 @@ import {
 } from "../model/recipeModel.js";
 
 export function RecipeDetail({
+  categories,
   recipe,
   selectedIngredientIds,
   isFavorite,
@@ -23,6 +24,7 @@ export function RecipeDetail({
   onOpenCommunity,
   onShareRecipe,
   onStartInteractive,
+  pantryIngredients,
 }) {
   if (!recipe) {
     return null;
@@ -34,7 +36,7 @@ export function RecipeDetail({
         <img alt={recipe.title} src={recipe.image} />
         <div className="recipe-detail-overlay" />
         <div>
-          <p>{getCategoryLabel(recipe.categoryId)}</p>
+          <p>{getCategoryLabel(recipe.categoryId, categories)}</p>
           <h2>{recipe.title}</h2>
           <span>{recipe.description}</span>
         </div>
@@ -102,7 +104,9 @@ export function RecipeDetail({
                   key={ingredientId}
                 >
                   <Check aria-hidden="true" size={16} />
-                  <span>{getIngredientLabel(ingredientId)}</span>
+                  <span>
+                    {getIngredientLabel(ingredientId, pantryIngredients)}
+                  </span>
                 </li>
               );
             })}

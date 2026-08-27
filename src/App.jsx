@@ -18,8 +18,6 @@ import { RecipesPage } from "./features/recipes/RecipesPage.jsx";
 import { useRecipeCatalog } from "./features/recipes/hooks/useRecipeCatalog.js";
 import SubirRecetaPage from "./features/subir-receta/SubirRecetaPage.jsx";
 
-const initialIngredients = ["egg", "tomato", "cheese", "tortilla", "avocado"];
-
 const navItems = [
   { id: "home", label: "Inicio", icon: Home },
   { id: "ingredients", label: "Despensa", icon: Refrigerator },
@@ -33,10 +31,13 @@ export function App() {
   const {
     recipeCatalog,
     approvedRecipes,
+    categories,
+    pantryIngredients,
     pendingRecipes,
     submitRecipe,
     updateRecipe,
     moderateRecipe,
+    syncState,
   } = useRecipeCatalog(auth.user, auth.profile);
   const {
     addComment,
@@ -52,7 +53,7 @@ export function App() {
     hasSharedRecipe ? "recipe-detail" : "home",
   );
   const [selectedIngredientIds, setSelectedIngredientIds] =
-    useState(initialIngredients);
+    useState([]);
   const [selectedRecipeId, setSelectedRecipeId] = useState(
     hasSharedRecipe ? sharedRecipeId : approvedRecipes[0]?.id ?? "",
   );
@@ -86,6 +87,31 @@ export function App() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
   }, [activeView]);
+
+  useEffect(() => {
+    if (!selectedRecipeId && approvedRecipes[0]) {
+      setSelectedRecipeId(approvedRecipes[0].id);
+    }
+
+    if (!selectedModerationRecipeId && recipeCatalog[0]) {
+      setSelectedModerationRecipeId(recipeCatalog[0].id);
+    }
+  }, [
+    approvedRecipes,
+    recipeCatalog,
+    selectedModerationRecipeId,
+    selectedRecipeId,
+  ]);
+
+  useEffect(() => {
+    if (
+      sharedRecipeId &&
+      approvedRecipes.some((recipe) => recipe.id === sharedRecipeId)
+    ) {
+      setSelectedRecipeId(sharedRecipeId);
+      setActiveView("recipe-detail");
+    }
+  }, [approvedRecipes, sharedRecipeId]);
 
   useEffect(() => {
     if (activeView !== "auth" || !postAuthView || !auth.user || auth.loading) {
@@ -216,9 +242,36 @@ export function App() {
     });
   }
 
-  function handleEditorModeration(recipeId, status) {
-    moderateRecipe(recipeId, status);
-    navigateTo("admin");
+  async function handleEditorModeration(recipeId, status) {
+    try {
+      await moderateRecipe(recipeId, status);
+      navigateTo("admin");
+    } catch {
+      // The editor stays open so the administrator can retry.
+    }
+  }
+
+  async function handleModeration(recipeId, status) {
+    try {
+      await moderateRecipe(recipeId, status);
+    } catch {
+      // Supabase remains the source of truth when a request fails.
+    }
+  }
+
+  async function handleToggleFavorite(recipeId) {
+    if (!auth.user) {
+      setPostAuthView(activeView);
+      setAccessMessage("Inicia sesion para guardar recetas favoritas.");
+      updateScreen(() => setActiveView("auth"));
+      return;
+    }
+
+    try {
+      await toggleFavorite(recipeId);
+    } catch (error) {
+      setShareStatus(error.message || "No se pudo actualizar el favorito.");
+    }
   }
 
   async function shareRecipe(recipe) {
@@ -260,6 +313,7 @@ export function App() {
       <IngredientesPage
         {...sharedPageProps}
         approvedRecipes={approvedRecipes}
+        pantryIngredients={pantryIngredients}
         selectedIngredientIds={selectedIngredientIds}
         onClearIngredients={clearIngredients}
         onOpenRecipes={() => openRecipes()}
@@ -274,6 +328,8 @@ export function App() {
       <RecipesPage
         {...sharedPageProps}
         approvedRecipes={approvedRecipes}
+        categories={categories}
+        pantryIngredients={pantryIngredients}
         selectedIngredientIds={selectedIngredientIds}
         selectedRecipeId={selectedRecipeId}
         onOpenRecipeDetail={openRecipeDetail}
@@ -287,13 +343,15 @@ export function App() {
         {...sharedPageProps}
         isFavorite={isFavorite(selectedRecipe?.id)}
         communityRating={getRecipeRating(selectedRecipe)}
+        categories={categories}
+        pantryIngredients={pantryIngredients}
         selectedIngredientIds={selectedIngredientIds}
         selectedRecipe={selectedRecipe}
         onBack={() => openRecipes(selectedRecipe?.id)}
         onOpenCommunity={openRecipeCommunity}
         onShareRecipe={shareRecipe}
         onStartInteractive={openInteractive}
-        onToggleFavorite={toggleFavorite}
+        onToggleFavorite={handleToggleFavorite}
         shareStatus={shareStatus}
       />
     );
@@ -304,6 +362,7 @@ export function App() {
       <RecipeCommunityPage
         {...sharedPageProps}
         comments={getRecipeComments(selectedRecipe?.id)}
+        isAuthenticated={Boolean(auth.user)}
         onAddComment={addComment}
         onBack={() => openRecipeDetail(selectedRecipe?.id)}
         onRateRecipe={rateRecipe}
@@ -317,6 +376,7 @@ export function App() {
     return (
       <ModoInteractivoPage
         {...sharedPageProps}
+        pantryIngredients={pantryIngredients}
         selectedIngredientIds={selectedIngredientIds}
         selectedRecipe={selectedRecipe}
         onBackToRecipe={() => openRecipeDetail(selectedRecipe?.id)}
@@ -339,6 +399,8 @@ export function App() {
     return (
       <SubirRecetaPage
         {...sharedPageProps}
+        categories={categories}
+        pantryIngredients={pantryIngredients}
         onSubmitRecipe={submitRecipe}
       />
     );
@@ -351,7 +413,7 @@ export function App() {
         approvedRecipes={approvedRecipes}
         favoriteRecipeIds={favoriteRecipeIds}
         onOpenRecipeDetail={openRecipeDetail}
-        onToggleFavorite={toggleFavorite}
+        onToggleFavorite={handleToggleFavorite}
       />
     );
   }
@@ -373,8 +435,9 @@ export function App() {
         {...sharedPageProps}
         onBack={() => navigateTo("home")}
         onEditRecipe={openAdminEditor}
-        onModerateRecipe={moderateRecipe}
+        onModerateRecipe={handleModeration}
         recipeCatalog={recipeCatalog}
+        categories={categories}
       />
     );
   }
@@ -398,6 +461,8 @@ export function App() {
         onModerateRecipe={handleEditorModeration}
         onSaveRecipe={updateRecipe}
         recipe={selectedModerationRecipe}
+        categories={categories}
+        pantryIngredients={pantryIngredients}
       />
     );
   }
@@ -407,10 +472,12 @@ export function App() {
       <DiscoverPage
         {...sharedPageProps}
         approvedRecipes={approvedRecipes}
+        categories={categories}
         getRecipeRating={getRecipeRating}
         onBack={() => navigateTo("home")}
         onOpenRecipe={openRecipeDetail}
         selectedIngredientIds={selectedIngredientIds}
+        user={auth.user}
       />
     );
   }
@@ -430,6 +497,7 @@ export function App() {
     <HomePage
       {...sharedPageProps}
       approvedRecipes={approvedRecipes}
+      categories={categories}
       currentProfile={auth.profile}
       isAdmin={auth.isAdmin}
       isFavorite={isFavorite}
@@ -441,9 +509,11 @@ export function App() {
       onOpenRecipes={openRecipes}
       onOpenRecipeDetail={openRecipeDetail}
       onStartInteractive={openInteractive}
-      onToggleFavorite={toggleFavorite}
+      onToggleFavorite={handleToggleFavorite}
       onToggleIngredient={toggleIngredient}
       pendingRecipes={pendingRecipes}
+      pantryIngredients={pantryIngredients}
+      syncState={syncState}
     />
   );
 }

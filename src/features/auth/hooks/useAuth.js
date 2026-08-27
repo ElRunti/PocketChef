@@ -1,18 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { isSupabaseConfigured, supabase } from "../../lib/supabase.js";
 
-function getFallbackProfile(user) {
-  if (!user) {
-    return null;
-  }
-
-  return {
-    id: user.id,
-    name: user.user_metadata?.name || user.email?.split("@")[0] || "Chef",
-    role: "user",
-  };
-}
-
 export function useAuth() {
   const [session, setSession] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -25,18 +13,25 @@ export function useAuth() {
       return null;
     }
 
-    const fallbackProfile = getFallbackProfile(user);
     const { data, error: profileError } = await supabase
       .from("profiles")
       .select("id,name,role")
       .eq("id", user.id)
       .maybeSingle();
 
-    if (profileError || !data) {
-      setProfile(fallbackProfile);
-      return fallbackProfile;
+    if (profileError) {
+      setProfile(null);
+      setError(profileError.message);
+      return null;
     }
 
+    if (!data) {
+      setProfile(null);
+      setError("No se encontro el perfil de esta cuenta en Supabase.");
+      return null;
+    }
+
+    setError("");
     setProfile(data);
     return data;
   }, []);

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { pantryIngredients } from "../../recipes/data/recipes.js";
 import StepEditor from "./StepEditor";
 import ImageUpload from "./ImageUpload.jsx";
 import RecipeIngredientSelector from "./RecipeIngredientSelector.jsx";
@@ -12,7 +11,7 @@ const initialSteps = [
     },
 ];
 
-function RecipeForm({ onSubmitRecipe }) {
+function RecipeForm({ categories, onSubmitRecipe, pantryIngredients }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [categoryId, setCategoryId] = useState("");
@@ -76,7 +75,7 @@ function RecipeForm({ onSubmitRecipe }) {
         setSaving(true);
 
         try {
-            const result = await onSubmitRecipe({
+            await onSubmitRecipe({
                 title: title.trim(),
                 description: description.trim(),
                 categoryId,
@@ -90,11 +89,7 @@ function RecipeForm({ onSubmitRecipe }) {
                 ),
             });
 
-            setMessage(
-                result.synced
-                    ? "Receta enviada a Supabase para revision."
-                    : "Receta guardada localmente. Ejecuta la migracion para sincronizarla."
-            );
+            setMessage("Receta enviada a Supabase para revision.");
             setTitle("");
             setDescription("");
             setCategoryId("");
@@ -203,29 +198,16 @@ function RecipeForm({ onSubmitRecipe }) {
                                 Selecciona una categoría
                             </option>
 
-                            <option value="breakfast">
-                                Desayunos
-                            </option>
-
-                            <option value="lunch">
-                                Almuerzos
-                            </option>
-
-                            <option value="dinner">
-                                Cenas
-                            </option>
-
-                            <option value="dessert">
-                                Postres
-                            </option>
-
-                            <option value="drinks">
-                                Bebidas
-                            </option>
-
-                            <option value="quick">
-                                Rápidas
-                            </option>
+                            {categories
+                                .filter((category) => category.id !== "all")
+                                .map((category) => (
+                                    <option
+                                        key={category.id}
+                                        value={category.id}
+                                    >
+                                        {category.label}
+                                    </option>
+                                ))}
                         </select>
                     </div>
 

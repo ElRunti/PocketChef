@@ -3096,6 +3096,35 @@ button.reject {
   color: var(--green);
 }
 
+.data-source-state {
+  display: grid;
+  min-height: 220px;
+  place-content: center;
+  gap: 8px;
+  padding: 28px;
+  border: 1px solid #d9dfd7;
+  border-radius: 8px;
+  background: #f7f8f4;
+  color: #354039;
+  text-align: center;
+}
+
+.data-source-state strong {
+  font-size: 1.05rem;
+}
+
+.data-source-state p {
+  max-width: 460px;
+  margin: 0;
+  color: #667068;
+  line-height: 1.5;
+}
+
+.data-source-state.error {
+  border-color: #e5b5aa;
+  background: #fff7f4;
+}
+
 .auth-access-message,
 .auth-panel > .auth-access-message,
 .account-panel > .auth-access-message {

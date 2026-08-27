@@ -1,16 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { isSupabaseConfigured, supabase } from "../../lib/supabase.js";
-import { recipes as seedRecipes } from "../data/recipes.js";
-
-const STORAGE_KEY = "pocket-chef-recipe-catalog-v1";
 
 const difficultyFromDatabase = {
   easy: "Facil",
   medium: "Media",
   hard: "Dificil",
-  Facil: "Facil",
-  Media: "Media",
-  Dificil: "Dificil",
 };
 
 const difficultyToDatabase = {
@@ -18,41 +12,6 @@ const difficultyToDatabase = {
   Media: "medium",
   Dificil: "hard",
 };
-
-function loadLocalCatalog() {
-  try {
-    const savedRecipes = JSON.parse(localStorage.getItem(STORAGE_KEY));
-
-    if (!Array.isArray(savedRecipes)) {
-      return seedRecipes;
-    }
-
-    const savedById = new Map(savedRecipes.map((recipe) => [recipe.id, recipe]));
-    const mergedSeeds = seedRecipes.map(
-      (recipe) => savedById.get(recipe.id) ?? recipe,
-    );
-    const communityRecipes = savedRecipes.filter(
-      (recipe) => !seedRecipes.some((seedRecipe) => seedRecipe.id === recipe.id),
-    );
-
-    return [...mergedSeeds, ...communityRecipes];
-  } catch {
-    return seedRecipes;
-  }
-}
-
-function createRecipeId(title) {
-  const slug = title
-    .trim()
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 42);
-
-  return `${slug || "receta"}-${Date.now().toString(36)}`;
-}
 
 function mapRemoteRecipe(recipe, profile) {
   const sortedSteps = [...(recipe.recipe_steps ?? [])].sort(
@@ -81,20 +40,6 @@ function mapRemoteRecipe(recipe, profile) {
     author: recipe.user_id === profile?.id ? profile.name : "Comunidad",
     createdAt: recipe.created_at,
     updatedAt: recipe.updated_at,
-    source: "supabase",
-  };
-}
-
-function createLocalRecipe(recipeDraft, profile) {
-  return {
-    ...recipeDraft,
-    id: recipeDraft.id ?? createRecipeId(recipeDraft.title),
-    author: recipeDraft.author ?? profile?.name ?? "Chef invitado",
-    createdAt: recipeDraft.createdAt ?? new Date().toISOString(),
-    rating: recipeDraft.rating ?? 0,
-    ratingCount: recipeDraft.ratingCount ?? 0,
-    source: recipeDraft.source ?? "local",
-    status: "pending",
   };
 }
 
@@ -112,73 +57,87 @@ function getRecipePayload(recipeDraft, userId) {
   };
 }
 
+function requireSupabase() {
+  if (!isSupabaseConfigured || !supabase) {
+    throw new Error("Supabase no esta configurado en este entorno.");
+  }
+}
+
 export function useRecipeCatalog(user, profile) {
-  const [recipeCatalog, setRecipeCatalog] = useState(loadLocalCatalog);
-  const [syncState, setSyncState] = useState({ status: "local", message: "" });
+  const [recipeCatalog, setRecipeCatalog] = useState([]);
+  const [categoryCatalog, setCategoryCatalog] = useState([]);
+  const [pantryIngredients, setPantryIngredients] = useState([]);
+  const [syncState, setSyncState] = useState({
+    status: "loading",
+    message: "Cargando informacion desde Supabase...",
+  });
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(recipeCatalog));
-    } catch {
-      // The in-memory catalog remains usable if browser storage is unavailable.
-    }
-  }, [recipeCatalog]);
-
-  useEffect(() => {
+  const loadCatalog = useCallback(async () => {
     if (!isSupabaseConfigured || !supabase) {
-      return undefined;
+      setRecipeCatalog([]);
+      setCategoryCatalog([]);
+      setPantryIngredients([]);
+      setSyncState({
+        status: "error",
+        message: "Configura Supabase para cargar la informacion.",
+      });
+      return;
     }
 
-    let active = true;
+    setSyncState({
+      status: "loading",
+      message: "Cargando informacion desde Supabase...",
+    });
 
-    async function loadRemoteCatalog() {
-      setSyncState({ status: "loading", message: "" });
-      const { data, error } = await supabase
-        .from("recipes")
-        .select(
-          "id,user_id,title,description,category_id,time_minutes,difficulty,image_url,rating,rating_count,status,created_at,updated_at,recipe_ingredients(ingredient_id),recipe_steps(step_number,text,has_timer,timer_minutes)",
-        )
-        .order("created_at", { ascending: false });
-
-      if (!active) {
-        return;
-      }
-
-      if (error) {
-        setSyncState({
-          status: "local",
-          message: "Supabase requiere ejecutar la migracion incluida.",
-        });
-        return;
-      }
-
-      const remoteRecipes = data.map((recipe) => mapRemoteRecipe(recipe, profile));
-      const localCatalog = loadLocalCatalog();
-      const approvedSeeds = seedRecipes.filter(
-        (recipe) => recipe.status === "approved",
-      );
-      const localCommunityRecipes = localCatalog.filter(
-        (recipe) =>
-          recipe.source === "local" &&
-          !seedRecipes.some((seedRecipe) => seedRecipe.id === recipe.id),
-      );
-      const remoteIds = new Set(remoteRecipes.map((recipe) => recipe.id));
-
-      setRecipeCatalog([
-        ...remoteRecipes,
-        ...approvedSeeds.filter((recipe) => !remoteIds.has(recipe.id)),
-        ...localCommunityRecipes.filter((recipe) => !remoteIds.has(recipe.id)),
+    const [recipesResult, categoriesResult, ingredientsResult] =
+      await Promise.all([
+        supabase
+          .from("recipes")
+          .select(
+            "id,user_id,title,description,category_id,time_minutes,difficulty,image_url,rating,rating_count,status,created_at,updated_at,recipe_ingredients(ingredient_id),recipe_steps(step_number,text,has_timer,timer_minutes)",
+          )
+          .order("created_at", { ascending: false }),
+        supabase.from("categories").select("id,name").order("name"),
+        supabase.from("ingredients").select("id,name").order("name"),
       ]);
-      setSyncState({ status: "synced", message: "Conectado con Supabase." });
+
+    const requestError =
+      recipesResult.error ?? categoriesResult.error ?? ingredientsResult.error;
+
+    if (requestError) {
+      setRecipeCatalog([]);
+      setCategoryCatalog([]);
+      setPantryIngredients([]);
+      setSyncState({ status: "error", message: requestError.message });
+      return;
     }
 
-    loadRemoteCatalog();
+    setRecipeCatalog(
+      recipesResult.data.map((recipe) => mapRemoteRecipe(recipe, profile)),
+    );
+    setCategoryCatalog(
+      categoriesResult.data.map((category) => ({
+        id: category.id,
+        label: category.name,
+      })),
+    );
+    setPantryIngredients(
+      ingredientsResult.data.map((ingredient) => ({
+        id: ingredient.id,
+        label: ingredient.name,
+      })),
+    );
+    setSyncState({ status: "synced", message: "Conectado con Supabase." });
+  }, [profile]);
 
-    return () => {
-      active = false;
-    };
-  }, [profile, user]);
+  useEffect(() => {
+    loadCatalog();
+  }, [loadCatalog, user]);
 
+  const categories = useMemo(
+    () => [{ id: "all", label: "Todas" }, ...categoryCatalog],
+    [categoryCatalog],
+  );
   const approvedRecipes = useMemo(
     () => recipeCatalog.filter((recipe) => recipe.status === "approved"),
     [recipeCatalog],
@@ -189,100 +148,99 @@ export function useRecipeCatalog(user, profile) {
   );
 
   async function submitRecipe(recipeDraft) {
-    let recipe = createLocalRecipe(recipeDraft, profile);
+    requireSupabase();
 
-    if (isSupabaseConfigured && supabase && user) {
-      let insertedRecipeId;
+    if (!user) {
+      throw new Error("Inicia sesion para publicar una receta.");
+    }
 
-      try {
-        const { data: remoteRecipe, error: recipeError } = await supabase
-          .from("recipes")
-          .insert(getRecipePayload(recipeDraft, user.id))
-          .select()
-          .single();
+    let insertedRecipeId;
 
-        if (recipeError) {
-          throw recipeError;
-        }
+    try {
+      const { data: remoteRecipe, error: recipeError } = await supabase
+        .from("recipes")
+        .insert(getRecipePayload(recipeDraft, user.id))
+        .select()
+        .single();
 
-        insertedRecipeId = remoteRecipe.id;
+      if (recipeError) {
+        throw recipeError;
+      }
 
-        const { error: ingredientsError } = await supabase
-          .from("recipe_ingredients")
-          .insert(
-            recipeDraft.ingredientIds.map((ingredientId) => ({
-              recipe_id: remoteRecipe.id,
-              ingredient_id: ingredientId,
-            })),
-          );
+      insertedRecipeId = remoteRecipe.id;
 
-        if (ingredientsError) {
-          throw ingredientsError;
-        }
-
-        const { error: stepsError } = await supabase.from("recipe_steps").insert(
-          recipeDraft.steps.map((step, index) => ({
+      const { error: ingredientsError } = await supabase
+        .from("recipe_ingredients")
+        .insert(
+          recipeDraft.ingredientIds.map((ingredientId) => ({
             recipe_id: remoteRecipe.id,
-            step_number: index + 1,
-            text: step,
-            has_timer: Boolean(recipeDraft.stepTimers?.[index]),
-            timer_minutes: recipeDraft.stepTimers?.[index] ?? null,
+            ingredient_id: ingredientId,
           })),
         );
 
-        if (stepsError) {
-          throw stepsError;
-        }
-
-        recipe = mapRemoteRecipe(
-          {
-            ...remoteRecipe,
-            recipe_ingredients: recipeDraft.ingredientIds.map(
-              (ingredientId) => ({ ingredient_id: ingredientId }),
-            ),
-            recipe_steps: recipeDraft.steps.map((step, index) => ({
-              step_number: index + 1,
-              text: step,
-              has_timer: Boolean(recipeDraft.stepTimers?.[index]),
-              timer_minutes: recipeDraft.stepTimers?.[index] ?? null,
-            })),
-          },
-          profile,
-        );
-        setSyncState({ status: "synced", message: "Receta sincronizada." });
-      } catch {
-        if (insertedRecipeId) {
-          await supabase.from("recipes").delete().eq("id", insertedRecipeId);
-        }
-        setSyncState({
-          status: "local",
-          message: "La receta quedo local hasta ejecutar la migracion.",
-        });
+      if (ingredientsError) {
+        throw ingredientsError;
       }
-    }
 
-    setRecipeCatalog((currentCatalog) => [recipe, ...currentCatalog]);
-    return { recipe, synced: recipe.source === "supabase" };
+      const recipeSteps = recipeDraft.steps.map((step, index) => ({
+        recipe_id: remoteRecipe.id,
+        step_number: index + 1,
+        text: step,
+        has_timer: Boolean(recipeDraft.stepTimers?.[index]),
+        timer_minutes: recipeDraft.stepTimers?.[index] ?? null,
+      }));
+      const { error: stepsError } = await supabase
+        .from("recipe_steps")
+        .insert(recipeSteps);
+
+      if (stepsError) {
+        throw stepsError;
+      }
+
+      const recipe = mapRemoteRecipe(
+        {
+          ...remoteRecipe,
+          recipe_ingredients: recipeDraft.ingredientIds.map(
+            (ingredientId) => ({ ingredient_id: ingredientId }),
+          ),
+          recipe_steps: recipeSteps,
+        },
+        profile,
+      );
+      setRecipeCatalog((currentCatalog) => [recipe, ...currentCatalog]);
+      setSyncState({ status: "synced", message: "Receta sincronizada." });
+      return { recipe, synced: true };
+    } catch (error) {
+      if (insertedRecipeId) {
+        await supabase
+          .from("recipe_steps")
+          .delete()
+          .eq("recipe_id", insertedRecipeId);
+        await supabase
+          .from("recipe_ingredients")
+          .delete()
+          .eq("recipe_id", insertedRecipeId);
+        await supabase.from("recipes").delete().eq("id", insertedRecipeId);
+      }
+
+      setSyncState({ status: "error", message: error.message });
+      throw error;
+    }
   }
 
   async function updateRecipe(recipeId, changes) {
+    requireSupabase();
     const currentRecipe = recipeCatalog.find((recipe) => recipe.id === recipeId);
+
+    if (!currentRecipe) {
+      throw new Error("La receta ya no existe en Supabase.");
+    }
+
     const updatedRecipe = {
       ...currentRecipe,
       ...changes,
       updatedAt: new Date().toISOString(),
     };
-
-    setRecipeCatalog((currentCatalog) =>
-      currentCatalog.map((recipe) =>
-        recipe.id === recipeId ? updatedRecipe : recipe,
-      ),
-    );
-
-    if (currentRecipe?.source !== "supabase" || !supabase) {
-      return { synced: false };
-    }
-
     const { error: recipeError } = await supabase
       .from("recipes")
       .update({
@@ -299,38 +257,77 @@ export function useRecipeCatalog(user, profile) {
 
     if (recipeError) {
       setSyncState({ status: "error", message: recipeError.message });
-      return { synced: false };
+      throw recipeError;
     }
 
     if (changes.ingredientIds) {
-      await supabase.from("recipe_ingredients").delete().eq("recipe_id", recipeId);
-      await supabase.from("recipe_ingredients").insert(
-        changes.ingredientIds.map((ingredientId) => ({
-          recipe_id: recipeId,
-          ingredient_id: ingredientId,
-        })),
-      );
+      const { error: deleteIngredientsError } = await supabase
+        .from("recipe_ingredients")
+        .delete()
+        .eq("recipe_id", recipeId);
+      if (deleteIngredientsError) {
+        throw deleteIngredientsError;
+      }
+
+      const { error: insertIngredientsError } = await supabase
+        .from("recipe_ingredients")
+        .insert(
+          changes.ingredientIds.map((ingredientId) => ({
+            recipe_id: recipeId,
+            ingredient_id: ingredientId,
+          })),
+        );
+      if (insertIngredientsError) {
+        throw insertIngredientsError;
+      }
     }
 
     if (changes.steps) {
-      await supabase.from("recipe_steps").delete().eq("recipe_id", recipeId);
-      await supabase.from("recipe_steps").insert(
-        changes.steps.map((step, index) => ({
-          recipe_id: recipeId,
-          step_number: index + 1,
-          text: step,
-          has_timer: false,
-          timer_minutes: null,
-        })),
-      );
+      const { error: deleteStepsError } = await supabase
+        .from("recipe_steps")
+        .delete()
+        .eq("recipe_id", recipeId);
+      if (deleteStepsError) {
+        throw deleteStepsError;
+      }
+
+      const { error: insertStepsError } = await supabase
+        .from("recipe_steps")
+        .insert(
+          changes.steps.map((step, index) => ({
+            recipe_id: recipeId,
+            step_number: index + 1,
+            text: step,
+            has_timer: false,
+            timer_minutes: null,
+          })),
+        );
+      if (insertStepsError) {
+        throw insertStepsError;
+      }
     }
 
+    setRecipeCatalog((currentCatalog) =>
+      currentCatalog.map((recipe) =>
+        recipe.id === recipeId ? updatedRecipe : recipe,
+      ),
+    );
     setSyncState({ status: "synced", message: "Cambios sincronizados." });
     return { synced: true };
   }
 
   async function moderateRecipe(recipeId, status) {
-    const currentRecipe = recipeCatalog.find((recipe) => recipe.id === recipeId);
+    requireSupabase();
+    const { error } = await supabase
+      .from("recipes")
+      .update({ status })
+      .eq("id", recipeId);
+
+    if (error) {
+      setSyncState({ status: "error", message: error.message });
+      throw error;
+    }
+
     setRecipeCatalog((currentCatalog) =>
       currentCatalog.map((recipe) =>
         recipe.id === recipeId
@@ -343,30 +340,18 @@ export function useRecipeCatalog(user, profile) {
           : recipe,
       ),
     );
-
-    if (currentRecipe?.source !== "supabase" || !supabase) {
-      return { synced: false };
-    }
-
-    const { error } = await supabase
-      .from("recipes")
-      .update({ status })
-      .eq("id", recipeId);
-
-    if (error) {
-      setSyncState({ status: "error", message: error.message });
-      return { synced: false };
-    }
-
     setSyncState({ status: "synced", message: "Moderacion sincronizada." });
     return { synced: true };
   }
 
   return {
     approvedRecipes,
+    categories,
     moderateRecipe,
+    pantryIngredients,
     pendingRecipes,
     recipeCatalog,
+    reloadCatalog: loadCatalog,
     submitRecipe,
     syncState,
     updateRecipe,

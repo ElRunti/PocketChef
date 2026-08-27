@@ -6,6 +6,7 @@ export function RecipeCommunityPage({
   recipe,
   rating,
   comments,
+  isAuthenticated,
   onAddComment,
   onBack,
   onRateRecipe,
@@ -14,16 +15,37 @@ export function RecipeCommunityPage({
   onNavigate,
 }) {
   const [commentText, setCommentText] = useState("");
+  const [actionMessage, setActionMessage] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
     if (!commentText.trim()) {
       return;
     }
 
-    onAddComment(recipe.id, commentText);
-    setCommentText("");
+    setSaving(true);
+    setActionMessage("");
+
+    try {
+      await onAddComment(recipe.id, commentText);
+      setCommentText("");
+    } catch (error) {
+      setActionMessage(error.message || "No se pudo publicar el comentario.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleRating(value) {
+    setActionMessage("");
+
+    try {
+      await onRateRecipe(recipe.id, value);
+    } catch (error) {
+      setActionMessage(error.message || "No se pudo guardar la calificacion.");
+    }
   }
 
   if (!recipe) {
@@ -63,8 +85,9 @@ export function RecipeCommunityPage({
                   aria-label={`${value} estrellas`}
                   aria-pressed={rating.userRating === value}
                   className={value <= rating.userRating ? "active" : ""}
+                  disabled={!isAuthenticated}
                   key={value}
-                  onClick={() => onRateRecipe(recipe.id, value)}
+                  onClick={() => handleRating(value)}
                   type="button"
                 >
                   <Star aria-hidden="true" fill="currentColor" size={25} />
@@ -87,15 +110,26 @@ export function RecipeCommunityPage({
             <MessageCircle aria-hidden="true" size={20} />
             <textarea
               aria-label="Escribe un comentario"
+              disabled={!isAuthenticated || saving}
               maxLength={280}
               onChange={(event) => setCommentText(event.target.value)}
               placeholder="Comparte un consejo o cambio que hiciste..."
               value={commentText}
             />
-            <button disabled={!commentText.trim()} type="submit">
+            <button
+              disabled={!isAuthenticated || saving || !commentText.trim()}
+              type="submit"
+            >
               Publicar
             </button>
           </form>
+
+          {!isAuthenticated && (
+            <p className="auth-access-message">
+              Inicia sesion para calificar o comentar.
+            </p>
+          )}
+          {actionMessage && <p className="auth-message">{actionMessage}</p>}
 
           <div className="comment-list">
             {comments.length > 0 ? (

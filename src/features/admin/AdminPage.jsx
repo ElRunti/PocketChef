@@ -11,6 +11,7 @@ const filters = [
 ];
 
 export function AdminPage({
+  categories,
   recipeCatalog,
   onBack,
   onEditRecipe,
@@ -91,6 +92,7 @@ export function AdminPage({
           {filteredRecipes.length > 0 ? (
             filteredRecipes.map((recipe) => (
               <ModerationRecipeCard
+                categories={categories}
                 key={recipe.id}
                 onEdit={onEditRecipe}
                 onModerate={onModerateRecipe}

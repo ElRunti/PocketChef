@@ -6,6 +6,7 @@ import { useIngredientSelection } from "./controllers/useIngredientSelection.js"
 
 export function IngredientesPage({
   approvedRecipes,
+  pantryIngredients,
   selectedIngredientIds,
   onToggleIngredient,
   onClearIngredients,
@@ -21,7 +22,11 @@ export function IngredientesPage({
     selectedIngredientLabels,
     recommendedRecipes,
     pantryProgress,
-  } = useIngredientSelection(selectedIngredientIds, approvedRecipes);
+  } = useIngredientSelection(
+    selectedIngredientIds,
+    approvedRecipes,
+    pantryIngredients,
+  );
 
   return (
     <main className="app-shell screen-page">

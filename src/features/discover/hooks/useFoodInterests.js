@@ -1,30 +1,58 @@
 import { useEffect, useState } from "react";
+import { isSupabaseConfigured, supabase } from "../../lib/supabase.js";
 
-const STORAGE_KEY = "pocket-chef-food-interests";
-
-function loadInterests() {
-  try {
-    const interests = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return Array.isArray(interests) ? interests : ["breakfast", "quick"];
-  } catch {
-    return ["breakfast", "quick"];
-  }
-}
-
-export function useFoodInterests() {
-  const [interestCategoryIds, setInterestCategoryIds] = useState(loadInterests);
+export function useFoodInterests(user) {
+  const [interestCategoryIds, setInterestCategoryIds] = useState([]);
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(interestCategoryIds));
-    } catch {
-      // Preferences remain active for the current session.
+    if (!isSupabaseConfigured || !supabase || !user) {
+      setInterestCategoryIds([]);
+      return undefined;
     }
-  }, [interestCategoryIds]);
 
-  function toggleInterest(categoryId) {
+    let active = true;
+
+    supabase
+      .from("profile_interests")
+      .select("category_id")
+      .eq("user_id", user.id)
+      .then(({ data, error }) => {
+        if (!active || error) {
+          return;
+        }
+
+        setInterestCategoryIds(data.map((interest) => interest.category_id));
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  async function toggleInterest(categoryId) {
+    if (!isSupabaseConfigured || !supabase || !user) {
+      throw new Error("Inicia sesion para guardar tus intereses.");
+    }
+
+    const removing = interestCategoryIds.includes(categoryId);
+    const request = removing
+      ? supabase
+          .from("profile_interests")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("category_id", categoryId)
+      : supabase.from("profile_interests").upsert({
+          user_id: user.id,
+          category_id: categoryId,
+        });
+    const { error } = await request;
+
+    if (error) {
+      throw error;
+    }
+
     setInterestCategoryIds((currentInterests) =>
-      currentInterests.includes(categoryId)
+      removing
         ? currentInterests.filter((id) => id !== categoryId)
         : [...currentInterests, categoryId],
     );

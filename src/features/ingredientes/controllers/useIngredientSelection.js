@@ -2,13 +2,19 @@ import { useMemo } from "react";
 import {
   getIngredientLabel,
   getRecommendedRecipes,
-  pantryIngredients,
 } from "../../recipes/model/recipeModel.js";
 
-export function useIngredientSelection(selectedIngredientIds, approvedRecipes) {
+export function useIngredientSelection(
+  selectedIngredientIds,
+  approvedRecipes,
+  pantryIngredients,
+) {
   const selectedIngredientLabels = useMemo(
-    () => selectedIngredientIds.map((ingredientId) => getIngredientLabel(ingredientId)),
-    [selectedIngredientIds],
+    () =>
+      selectedIngredientIds.map((ingredientId) =>
+        getIngredientLabel(ingredientId, pantryIngredients),
+      ),
+    [pantryIngredients, selectedIngredientIds],
   );
 
   const recommendedRecipes = useMemo(
@@ -18,7 +24,9 @@ export function useIngredientSelection(selectedIngredientIds, approvedRecipes) {
 
   const selectedCount = selectedIngredientIds.length;
   const pantryProgress = Math.round(
-    (selectedCount / pantryIngredients.length) * 100,
+    pantryIngredients.length > 0
+      ? (selectedCount / pantryIngredients.length) * 100
+      : 0,
   );
 
   return {

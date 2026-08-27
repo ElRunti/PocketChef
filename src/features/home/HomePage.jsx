@@ -9,10 +9,8 @@ import {
 } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import {
-  categories,
   countMissingIngredients,
   filterRecipes,
-  pantryIngredients,
 } from "../recipes/model/recipeModel.js";
 import { AppHeader } from "./components/AppHeader.jsx";
 import { CategoryTabs } from "./components/CategoryTabs.jsx";
@@ -23,9 +21,12 @@ import { SearchPanel } from "./components/SearchPanel.jsx";
 
 export function HomePage({
   approvedRecipes,
+  categories,
   currentProfile,
   isAdmin,
   pendingRecipes,
+  pantryIngredients,
+  syncState,
   selectedIngredientIds,
   isFavorite,
   onToggleFavorite,
@@ -75,11 +76,24 @@ export function HomePage({
               onOpenFilters={() => onOpenRecipes()}
               onQueryChange={setQuery}
             />
-            <FeaturedRecipe
-              recipe={featuredRecipe}
-              matchLabel={`${selectedIngredientIds.length} ingredientes`}
-              onStartCooking={() => onStartInteractive(featuredRecipe.id)}
-            />
+            {featuredRecipe ? (
+              <FeaturedRecipe
+                recipe={featuredRecipe}
+                matchLabel={`${selectedIngredientIds.length} ingredientes`}
+                onStartCooking={() => onStartInteractive(featuredRecipe.id)}
+              />
+            ) : (
+              <div className={`data-source-state ${syncState.status}`}>
+                <strong>
+                  {syncState.status === "loading"
+                    ? "Cargando recetas"
+                    : syncState.status === "error"
+                      ? "No se pudo cargar la informacion"
+                      : "Aun no hay recetas publicadas"}
+                </strong>
+                <p>{syncState.message}</p>
+              </div>
+            )}
             <section className="home-action-grid">
               <button onClick={onOpenIngredients} type="button">
                 <Refrigerator aria-hidden="true" size={22} />
@@ -91,7 +105,11 @@ export function HomePage({
                 <strong>Recetas</strong>
                 <span>Busca y filtra</span>
               </button>
-              <button onClick={() => onStartInteractive(featuredRecipe.id)} type="button">
+              <button
+                disabled={!featuredRecipe}
+                onClick={() => onStartInteractive(featuredRecipe.id)}
+                type="button"
+              >
                 <Timer aria-hidden="true" size={22} />
                 <strong>Modo guiado</strong>
                 <span>Cocina paso a paso</span>

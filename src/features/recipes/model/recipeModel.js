@@ -1,9 +1,3 @@
-import {
-  categories,
-  pantryIngredients,
-  recipes,
-} from "../data/recipes.js";
-
 const approvedStatus = "approved";
 const pendingStatus = "pending";
 
@@ -11,40 +5,34 @@ function normalizeText(value) {
   return value.trim().toLowerCase();
 }
 
-export function getApprovedRecipes(recipeList = recipes) {
+export function getApprovedRecipes(recipeList = []) {
   return recipeList.filter((recipe) => recipe.status === approvedStatus);
 }
 
-export function getPendingRecipes(recipeList = recipes) {
+export function getPendingRecipes(recipeList = []) {
   return recipeList.filter((recipe) => recipe.status === pendingStatus);
 }
 
-export function getRecipeById(recipeId, recipeList = recipes) {
+export function getRecipeById(recipeId, recipeList = []) {
   return recipeList.find((recipe) => recipe.id === recipeId);
 }
 
-export function getDefaultRecipe() {
-  return getApprovedRecipes()[0];
+export function getIngredientLabel(ingredientId, ingredients = []) {
+  return (
+    ingredients.find((ingredient) => ingredient.id === ingredientId)?.label ??
+    ingredientId
+  );
 }
 
-export function getIngredientById(ingredientId) {
-  return pantryIngredients.find((ingredient) => ingredient.id === ingredientId);
-}
-
-export function getIngredientLabel(ingredientId) {
-  return getIngredientById(ingredientId)?.label ?? ingredientId;
-}
-
-export function getCategoryById(categoryId) {
-  return categories.find((category) => category.id === categoryId);
-}
-
-export function getCategoryLabel(categoryId) {
-  return getCategoryById(categoryId)?.label ?? "Sin categoria";
+export function getCategoryLabel(categoryId, categories = []) {
+  return (
+    categories.find((category) => category.id === categoryId)?.label ??
+    "Sin categoria"
+  );
 }
 
 export function getRecipeTimeMinutes(recipe) {
-  return Number.parseInt(recipe.time, 10) || 0;
+  return Number.parseInt(recipe?.time, 10) || 0;
 }
 
 export function getMissingIngredientIds(recipe, selectedIngredientIds) {
@@ -62,7 +50,7 @@ export function countMissingIngredients(recipe, selectedIngredientIds) {
 }
 
 export function getRecipeMatchPercent(recipe, selectedIngredientIds) {
-  if (selectedIngredientIds.length === 0) {
+  if (selectedIngredientIds.length === 0 || recipe.ingredientIds.length === 0) {
     return 100;
   }
 
@@ -75,7 +63,7 @@ export function getRecipeMatchPercent(recipe, selectedIngredientIds) {
 }
 
 export function filterRecipes({
-  recipeList = getApprovedRecipes(),
+  recipeList = [],
   query = "",
   categoryId = "all",
   difficulty = "all",
@@ -110,7 +98,7 @@ export function filterRecipes({
 
 export function getRecommendedRecipes(
   selectedIngredientIds,
-  recipeList = getApprovedRecipes(),
+  recipeList = [],
 ) {
   return getApprovedRecipes(recipeList)
     .map((recipe) => ({
@@ -127,12 +115,11 @@ export function getRecommendedRecipes(
     });
 }
 
-export function getPopularRecipes(recipeList = getApprovedRecipes()) {
+export function getPopularRecipes(recipeList = []) {
   return getApprovedRecipes(recipeList)
     .map((recipe) => ({
       ...recipe,
-      popularityScore:
-        recipe.rating * Math.max(recipe.ratingCount ?? 24, 1),
+      popularityScore: recipe.rating * Math.max(recipe.ratingCount ?? 0, 1),
     }))
     .sort(
       (firstRecipe, secondRecipe) =>
@@ -143,7 +130,7 @@ export function getPopularRecipes(recipeList = getApprovedRecipes()) {
 export function getRecipesByInterests(
   interestCategoryIds,
   selectedIngredientIds,
-  recipeList = getApprovedRecipes(),
+  recipeList = [],
 ) {
   const approvedRecipes = getApprovedRecipes(recipeList);
   const hasInterests = interestCategoryIds.length > 0;
@@ -167,5 +154,3 @@ export function getRecipesByInterests(
       return secondRecipe.rating - firstRecipe.rating;
     });
 }
-
-export { categories, pantryIngredients, recipes };

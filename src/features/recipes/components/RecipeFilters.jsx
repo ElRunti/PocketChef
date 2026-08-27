@@ -1,13 +1,12 @@
 import { Search, SlidersHorizontal } from "lucide-react";
-import {
-  categories,
-  getIngredientLabel,
-} from "../model/recipeModel.js";
+import { getIngredientLabel } from "../model/recipeModel.js";
 import { difficultyOptions, timeOptions } from "../controllers/useRecipeFilters.js";
 
 export function RecipeFilters({
+  categories,
   filters,
   actions,
+  pantryIngredients,
   selectedIngredientIds,
   onToggleIngredientMode,
 }) {
@@ -93,7 +92,9 @@ export function RecipeFilters({
       <div className="selected-ingredient-row">
         {selectedIngredientIds.length > 0 ? (
           selectedIngredientIds.map((ingredientId) => (
-            <span key={ingredientId}>{getIngredientLabel(ingredientId)}</span>
+            <span key={ingredientId}>
+              {getIngredientLabel(ingredientId, pantryIngredients)}
+            </span>
           ))
         ) : (
           <span>Sin ingredientes seleccionados</span>

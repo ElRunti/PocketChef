@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { ArrowLeft, Check, Save, X } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
-import { categories, pantryIngredients } from "../recipes/model/recipeModel.js";
 
 export function AdminRecipeEditorPage({
+  categories,
   recipe,
   onBack,
   onModerateRecipe,
   onSaveRecipe,
+  pantryIngredients,
   activeView,
   navItems,
   onNavigate,
@@ -51,7 +52,7 @@ export function AdminRecipeEditorPage({
     );
   }
 
-  function saveChanges(event) {
+  async function saveChanges(event) {
     event.preventDefault();
     const steps = form.steps
       .split("\n")
@@ -62,14 +63,18 @@ export function AdminRecipeEditorPage({
       return;
     }
 
-    onSaveRecipe(recipe.id, {
-      ...form,
-      title: form.title.trim(),
-      description: form.description.trim(),
-      time: `${Number(form.time)} min`,
-      steps,
-    });
-    setSaved(true);
+    try {
+      await onSaveRecipe(recipe.id, {
+        ...form,
+        title: form.title.trim(),
+        description: form.description.trim(),
+        time: `${Number(form.time)} min`,
+        steps,
+      });
+      setSaved(true);
+    } catch {
+      setSaved(false);
+    }
   }
 
   return (

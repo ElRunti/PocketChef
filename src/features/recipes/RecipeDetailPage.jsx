@@ -3,6 +3,8 @@ import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import { RecipeDetail } from "./components/RecipeDetail.jsx";
 
 export function RecipeDetailPage({
+  categories,
+  pantryIngredients,
   selectedRecipe,
   selectedIngredientIds,
   isFavorite,
@@ -26,6 +28,7 @@ export function RecipeDetailPage({
         </button>
 
         <RecipeDetail
+          categories={categories}
           communityRating={communityRating}
           isFavorite={isFavorite}
           onStartInteractive={onStartInteractive}
@@ -33,6 +36,7 @@ export function RecipeDetailPage({
           onShareRecipe={onShareRecipe}
           onToggleFavorite={onToggleFavorite}
           recipe={selectedRecipe}
+          pantryIngredients={pantryIngredients}
           selectedIngredientIds={selectedIngredientIds}
           shareStatus={shareStatus}
         />
