@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../../lib/supabase.js";
+import { isSupabaseConfigured, supabase } from "../../lib/supabase.js";
 import { pantryIngredients } from "../../recipes/data/recipes.js";
 import StepEditor from "./StepEditor";
 import ImageUpload from "./ImageUpload.jsx";
@@ -71,6 +71,13 @@ function RecipeForm() {
 
         if (!image) {
             setMessage("Selecciona una imagen para la receta.");
+            return;
+        }
+
+        if (!isSupabaseConfigured || !supabase) {
+            setMessage(
+                "Configura Supabase en el archivo .env antes de enviar recetas."
+            );
             return;
         }
 

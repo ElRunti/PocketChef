@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { supabase } from "../../lib/supabase.js";
+import { isSupabaseConfigured, supabase } from "../../lib/supabase.js";
 
 function ImageUpload({ image, setImage }) {
     const [uploading, setUploading] = useState(false);
@@ -13,6 +13,12 @@ function ImageUpload({ image, setImage }) {
         }
 
         setError("");
+
+        if (!isSupabaseConfigured || !supabase) {
+            setError("Configura Supabase en el archivo .env para subir imagenes.");
+            return;
+        }
+
         setUploading(true);
 
         try {
