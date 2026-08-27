@@ -96,11 +96,21 @@ export function useRecipeCommunity(user, profile) {
         throw error;
       }
 
-      const { data: aggregate, error: aggregateError } = await supabase
+      let { data: aggregate, error: aggregateError } = await supabase
         .from("recipes")
         .select("rating,rating_count")
         .eq("id", recipeId)
         .single();
+
+      if (aggregateError?.message.includes("rating_count")) {
+        const legacyAggregate = await supabase
+          .from("recipes")
+          .select("rating")
+          .eq("id", recipeId)
+          .single();
+        aggregate = legacyAggregate.data;
+        aggregateError = legacyAggregate.error;
+      }
 
       setRatings((currentRatings) => ({
         ...currentRatings,
@@ -112,7 +122,7 @@ export function useRecipeCommunity(user, profile) {
           ...currentAggregates,
           [recipeId]: {
             average: Number(aggregate.rating) || 0,
-            count: aggregate.rating_count ?? 0,
+            count: aggregate.rating_count ?? 1,
           },
         }));
       }

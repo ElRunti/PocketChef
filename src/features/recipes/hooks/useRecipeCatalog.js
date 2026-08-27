@@ -13,6 +13,27 @@ const difficultyToDatabase = {
   Dificil: "hard",
 };
 
+const recipeFields =
+  "id,user_id,title,description,category_id,time_minutes,difficulty,image_url,rating,rating_count,status,created_at,updated_at,recipe_ingredients(ingredient_id),recipe_steps(step_number,text,has_timer,timer_minutes)";
+const legacyRecipeFields =
+  "id,user_id,title,description,category_id,time_minutes,difficulty,image_url,rating,status,created_at,updated_at,recipe_ingredients(ingredient_id),recipe_steps(step_number,text,has_timer,timer_minutes)";
+
+async function fetchRemoteRecipes() {
+  let result = await supabase
+    .from("recipes")
+    .select(recipeFields)
+    .order("created_at", { ascending: false });
+
+  if (result.error?.message.includes("rating_count")) {
+    result = await supabase
+      .from("recipes")
+      .select(legacyRecipeFields)
+      .order("created_at", { ascending: false });
+  }
+
+  return result;
+}
+
 function mapRemoteRecipe(recipe, profile) {
   const sortedSteps = [...(recipe.recipe_steps ?? [])].sort(
     (firstStep, secondStep) => firstStep.step_number - secondStep.step_number,
@@ -91,12 +112,7 @@ export function useRecipeCatalog(user, profile) {
 
     const [recipesResult, categoriesResult, ingredientsResult] =
       await Promise.all([
-        supabase
-          .from("recipes")
-          .select(
-            "id,user_id,title,description,category_id,time_minutes,difficulty,image_url,rating,rating_count,status,created_at,updated_at,recipe_ingredients(ingredient_id),recipe_steps(step_number,text,has_timer,timer_minutes)",
-          )
-          .order("created_at", { ascending: false }),
+        fetchRemoteRecipes(),
         supabase.from("categories").select("id,name").order("name"),
         supabase.from("ingredients").select("id,name").order("name"),
       ]);
