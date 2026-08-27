@@ -1,6 +1,6 @@
-import { Clock, Heart, Star } from "lucide-react";
+import { ArrowRight, Clock, Heart, Star } from "lucide-react";
 
-export function RecipeCard({ recipe, missingIngredients }) {
+export function RecipeCard({ recipe, missingIngredients, onSelectRecipe }) {
   const matchText =
     missingIngredients === 0 ? "Lista para cocinar" : `Faltan ${missingIngredients}`;
 
@@ -20,16 +20,22 @@ export function RecipeCard({ recipe, missingIngredients }) {
 
         <span className="recipe-description">{recipe.description}</span>
 
-        <div className="recipe-meta">
-          <span>
-            <Clock aria-hidden="true" size={14} />
-            {recipe.time}
-          </span>
-          <span>{recipe.difficulty}</span>
-          <span>
-            <Star aria-hidden="true" size={14} />
-            {recipe.rating}
-          </span>
+        <div className="recipe-card-footer">
+          <div className="recipe-meta">
+            <span>
+              <Clock aria-hidden="true" size={14} />
+              {recipe.time}
+            </span>
+            <span>{recipe.difficulty}</span>
+            <span>
+              <Star aria-hidden="true" size={14} />
+              {recipe.rating}
+            </span>
+          </div>
+          <button className="recipe-card-open" onClick={onSelectRecipe} type="button">
+            Ver
+            <ArrowRight aria-hidden="true" size={15} />
+          </button>
         </div>
       </div>
     </article>

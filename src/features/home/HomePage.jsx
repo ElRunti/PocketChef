@@ -3,9 +3,12 @@ import { PlusCircle, ShieldCheck, Utensils } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import {
   categories,
+  countMissingIngredients,
+  filterRecipes,
+  getApprovedRecipes,
+  getPendingRecipes,
   pantryIngredients,
-  recipes,
-} from "../recipes/data/recipes.js";
+} from "../recipes/model/recipeModel.js";
 import { AppHeader } from "./components/AppHeader.jsx";
 import { CategoryTabs } from "./components/CategoryTabs.jsx";
 import { FeaturedRecipe } from "./components/FeaturedRecipe.jsx";
@@ -14,53 +17,34 @@ import { IngredientSelector } from "./components/IngredientSelector.jsx";
 import { RecipeCard } from "./components/RecipeCard.jsx";
 import { SearchPanel } from "./components/SearchPanel.jsx";
 
-const initialIngredients = ["egg", "tomato", "cheese", "tortilla", "avocado"];
-
-function countMissingIngredients(recipe, selectedIngredientIds) {
-  if (selectedIngredientIds.length === 0) {
-    return 0;
-  }
-
-  return recipe.ingredientIds.filter(
-    (ingredientId) => !selectedIngredientIds.includes(ingredientId),
-  ).length;
-}
-
-export function HomePage() {
+export function HomePage({
+  selectedIngredientIds,
+  onToggleIngredient,
+  onOpenIngredients,
+  onOpenRecipes,
+  onSelectRecipe,
+  onStartInteractive,
+  activeView,
+  navItems,
+  onNavigate,
+}) {
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [selectedIngredientIds, setSelectedIngredientIds] =
-    useState(initialIngredients);
   const [activeStep, setActiveStep] = useState(0);
 
-  const approvedRecipes = recipes.filter((recipe) => recipe.status === "approved");
-  const pendingRecipes = recipes.filter((recipe) => recipe.status === "pending");
+  const approvedRecipes = useMemo(() => getApprovedRecipes(), []);
+  const pendingRecipes = useMemo(() => getPendingRecipes(), []);
   const featuredRecipe = approvedRecipes[0];
 
   const filteredRecipes = useMemo(() => {
-    return approvedRecipes.filter((recipe) => {
-      const matchesSearch = recipe.title
-        .toLowerCase()
-        .includes(query.trim().toLowerCase());
-      const matchesCategory =
-        activeCategory === "all" || recipe.categoryId === activeCategory;
-      const matchesIngredients =
-        selectedIngredientIds.length === 0 ||
-        recipe.ingredientIds.every((ingredientId) =>
-          selectedIngredientIds.includes(ingredientId),
-        );
-
-      return matchesSearch && matchesCategory && matchesIngredients;
+    return filterRecipes({
+      recipeList: approvedRecipes,
+      query,
+      categoryId: activeCategory,
+      selectedIngredientIds,
+      onlyAvailable: true,
     });
   }, [activeCategory, approvedRecipes, query, selectedIngredientIds]);
-
-  function toggleIngredient(ingredientId) {
-    setSelectedIngredientIds((currentIngredients) =>
-      currentIngredients.includes(ingredientId)
-        ? currentIngredients.filter((id) => id !== ingredientId)
-        : [...currentIngredients, ingredientId],
-    );
-  }
 
   function handlePreviousStep() {
     setActiveStep((currentStep) => Math.max(currentStep - 1, 0));
@@ -79,10 +63,15 @@ export function HomePage() {
 
         <div className="home-layout">
           <div>
-            <SearchPanel query={query} onQueryChange={setQuery} />
+            <SearchPanel
+              query={query}
+              onOpenFilters={() => onOpenRecipes()}
+              onQueryChange={setQuery}
+            />
             <FeaturedRecipe
               recipe={featuredRecipe}
               matchLabel={`${selectedIngredientIds.length} ingredientes`}
+              onStartCooking={() => onStartInteractive(featuredRecipe.id)}
             />
             <CategoryTabs
               activeCategory={activeCategory}
@@ -92,7 +81,8 @@ export function HomePage() {
             <IngredientSelector
               ingredients={pantryIngredients}
               selectedIngredientIds={selectedIngredientIds}
-              onToggleIngredient={toggleIngredient}
+              onSearchByIngredients={onOpenIngredients}
+              onToggleIngredient={onToggleIngredient}
             />
           </div>
 
@@ -130,6 +120,10 @@ export function HomePage() {
                     <RecipeCard
                       key={recipe.id}
                       recipe={recipe}
+                      onSelectRecipe={() => {
+                        onSelectRecipe(recipe.id);
+                        onOpenRecipes(recipe.id);
+                      }}
                       missingIngredients={countMissingIngredients(
                         recipe,
                         selectedIngredientIds,
@@ -158,7 +152,11 @@ export function HomePage() {
         </div>
       </div>
 
-      <BottomNavigation />
+      <BottomNavigation
+        activeItemId={activeView}
+        items={navItems}
+        onNavigate={onNavigate}
+      />
     </main>
   );
 }

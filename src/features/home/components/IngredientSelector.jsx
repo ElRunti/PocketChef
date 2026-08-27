@@ -3,6 +3,7 @@ import { Check, Refrigerator } from "lucide-react";
 export function IngredientSelector({
   ingredients,
   selectedIngredientIds,
+  onSearchByIngredients,
   onToggleIngredient,
 }) {
   return (
@@ -33,6 +34,14 @@ export function IngredientSelector({
           );
         })}
       </div>
+
+      <button
+        className="ingredient-search-button"
+        onClick={onSearchByIngredients}
+        type="button"
+      >
+        Buscar por ingredientes disponibles
+      </button>
     </section>
   );
 }
