@@ -4759,6 +4759,34 @@ body {
   min-width: 0;
 }
 
+.home-layout > *,
+.home-primary,
+.home-utility,
+.recipe-results,
+.ingredient-section,
+.recipes-layout,
+.recipes-layout > *,
+.recipes-sidebar,
+.recipe-filter-panel,
+.recipe-result-list,
+.filter-grid > label,
+.interactive-layout,
+.interactive-layout > *,
+.interactive-stage,
+.interactive-side-panel {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.category-tabs,
+.user-recipe-filters,
+.moderation-filters,
+.admin-sections {
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
+}
+
 .home-action-grid {
   gap: 0.7rem;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5278,6 +5306,15 @@ body {
 }
 
 @media (max-width: 430px) {
+  .page-title-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .page-title-row > span {
+    margin-left: auto;
+  }
+
   .home-action-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -5298,12 +5335,83 @@ body {
   .recipe-detail-stats span {
     font-size: 0.7rem;
   }
+
+  .admin-catalog-heading,
+  .moderation-card-content > header,
+  .user-recipe-card footer {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-catalog-add > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-catalog-add button {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .admin-catalog-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-catalog-actions {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .user-recipe-card footer button {
+    margin-left: auto;
+  }
 }
 
 @media (max-width: 360px) {
   .page-container {
     padding-left: 0.8rem;
     padding-right: 0.8rem;
+  }
+
+  .app-header {
+    gap: 0.5rem;
+  }
+
+  .brand {
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    height: 2.5rem;
+    width: 2.5rem;
+  }
+
+  .brand p {
+    font-size: 0.68rem;
+    white-space: nowrap;
+  }
+
+  .brand h1 {
+    font-size: 1.15rem;
+    white-space: nowrap;
+  }
+
+  .header-actions {
+    gap: 0.3rem;
+  }
+
+  .header-actions > .icon-button:first-child {
+    display: none;
+  }
+
+  .icon-button,
+  .admin-dashboard-button,
+  .user-dashboard-button {
+    height: 2.5rem;
+    min-height: 2.5rem;
+    width: 2.5rem;
   }
 
   .recipe-list {
@@ -5315,7 +5423,13 @@ body {
   }
 
   .bottom-navigation {
-    width: calc(100% - 0.8rem);
+    width: calc(100% - 0.5rem);
+  }
+
+  .bottom-navigation button {
+    font-size: 0.58rem;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
