@@ -1062,3 +1062,105 @@ img {
 .submit-recipe-button:active {
   transform: translateY(1px);
 }
+
+.admin-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px 60px;
+}
+
+.admin-header {
+    margin-bottom: 32px;
+}
+
+.admin-eyebrow,
+.section-eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    margin-bottom: 8px;
+}
+
+.admin-header h1 {
+    margin: 0;
+    font-size: 36px;
+}
+
+.admin-header p {
+    margin-top: 8px;
+    color: #666;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 32px;
+}
+
+.admin-tab {
+    border: none;
+    background: transparent;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #777;
+    border-bottom: 3px solid transparent;
+}
+
+.admin-tab.active {
+    color: #111;
+    border-bottom-color: #111;
+}
+
+.admin-content {
+    width: 100%;
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.section-heading h2 {
+    margin: 0;
+    font-size: 26px;
+}
+
+.section-heading p {
+    margin: 6px 0 0;
+    color: #777;
+}
+
+.pending-count {
+    background: #f1f1f1;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.community-recipes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    border: 1px dashed #ddd;
+    border-radius: 16px;
+}
+
+.empty-state h3 {
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    color: #777;
+}
