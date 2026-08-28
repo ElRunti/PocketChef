@@ -1,4 +1,4 @@
-import { Bell, ChefHat, Sparkles, UserRound } from "lucide-react";
+import { ChefHat, LayoutDashboard, Sparkles, UserRound } from "lucide-react";
 
 export function AppHeader({
   currentProfile,
@@ -31,13 +31,14 @@ export function AppHeader({
         </button>
         {isAdmin && (
           <button
-            className="icon-button notification-button"
-            aria-label="Ver recetas pendientes"
+            className="admin-dashboard-button notification-button"
+            aria-label="Abrir panel de administracion"
             onClick={onOpenAdmin}
             type="button"
           >
-            <Bell aria-hidden="true" size={21} />
-            <span>{pendingCount}</span>
+            <LayoutDashboard aria-hidden="true" size={19} />
+            <strong>Administrar</strong>
+            {pendingCount > 0 && <span>{pendingCount}</span>}
           </button>
         )}
         <button

@@ -3,6 +3,8 @@ begin;
 grant usage on schema public to anon, authenticated;
 
 grant select on public.categories, public.ingredients to anon, authenticated;
+grant insert, update, delete on public.categories, public.ingredients
+  to authenticated;
 grant select on public.recipes, public.recipe_ingredients, public.recipe_steps
   to anon, authenticated;
 grant insert, update, delete on public.recipes, public.recipe_ingredients,
@@ -164,9 +166,21 @@ drop policy if exists categories_are_public on public.categories;
 create policy categories_are_public on public.categories
 for select using (true);
 
+drop policy if exists categories_admin_manage on public.categories;
+create policy categories_admin_manage on public.categories
+for all to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
 drop policy if exists ingredients_are_public on public.ingredients;
 create policy ingredients_are_public on public.ingredients
 for select using (true);
+
+drop policy if exists ingredients_admin_manage on public.ingredients;
+create policy ingredients_admin_manage on public.ingredients
+for all to authenticated
+using (public.is_admin())
+with check (public.is_admin());
 
 drop policy if exists profiles_read_own_or_admin on public.profiles;
 create policy profiles_read_own_or_admin on public.profiles

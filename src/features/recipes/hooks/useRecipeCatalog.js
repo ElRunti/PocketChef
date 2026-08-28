@@ -84,6 +84,37 @@ function requireSupabase() {
   }
 }
 
+function createCatalogId(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 48);
+}
+
+function sortCatalog(items) {
+  return [...items].sort((firstItem, secondItem) =>
+    firstItem.label.localeCompare(secondItem.label, "es"),
+  );
+}
+
+function getCatalogError(error, label) {
+  if (error.code === "23505") {
+    return new Error(`Ya existe ${label} con ese nombre.`);
+  }
+
+  if (error.code === "23503") {
+    return new Error(
+      `No se puede eliminar porque ${label} esta en uso por una receta.`,
+    );
+  }
+
+  return error;
+}
+
 export function useRecipeCatalog(user, profile) {
   const [recipeCatalog, setRecipeCatalog] = useState([]);
   const [categoryCatalog, setCategoryCatalog] = useState([]);
@@ -162,6 +193,109 @@ export function useRecipeCatalog(user, profile) {
     () => recipeCatalog.filter((recipe) => recipe.status === "pending"),
     [recipeCatalog],
   );
+
+  function requireAdmin() {
+    requireSupabase();
+
+    if (profile?.role !== "admin") {
+      throw new Error("Solo un administrador puede modificar este catalogo.");
+    }
+  }
+
+  async function createCatalogItem(table, name, setCatalog, label) {
+    requireAdmin();
+    const cleanName = name.trim();
+    const id = createCatalogId(cleanName);
+
+    if (!cleanName || !id) {
+      throw new Error(`Escribe un nombre valido para ${label}.`);
+    }
+
+    const { data, error } = await supabase
+      .from(table)
+      .insert({ id, name: cleanName })
+      .select("id,name")
+      .single();
+
+    if (error) {
+      throw getCatalogError(error, label);
+    }
+
+    const catalogItem = { id: data.id, label: data.name };
+    setCatalog((currentCatalog) => sortCatalog([...currentCatalog, catalogItem]));
+    return catalogItem;
+  }
+
+  async function updateCatalogItem(table, id, name, setCatalog, label) {
+    requireAdmin();
+    const cleanName = name.trim();
+
+    if (!cleanName) {
+      throw new Error(`Escribe un nombre valido para ${label}.`);
+    }
+
+    const { data, error } = await supabase
+      .from(table)
+      .update({ name: cleanName })
+      .eq("id", id)
+      .select("id,name")
+      .single();
+
+    if (error) {
+      throw getCatalogError(error, label);
+    }
+
+    const catalogItem = { id: data.id, label: data.name };
+    setCatalog((currentCatalog) =>
+      sortCatalog(
+        currentCatalog.map((item) => (item.id === id ? catalogItem : item)),
+      ),
+    );
+    return catalogItem;
+  }
+
+  async function deleteCatalogItem(table, id, setCatalog, label) {
+    requireAdmin();
+    const { error } = await supabase.from(table).delete().eq("id", id);
+
+    if (error) {
+      throw getCatalogError(error, label);
+    }
+
+    setCatalog((currentCatalog) =>
+      currentCatalog.filter((item) => item.id !== id),
+    );
+  }
+
+  const addIngredient = (name) =>
+    createCatalogItem("ingredients", name, setPantryIngredients, "un ingrediente");
+  const renameIngredient = (id, name) =>
+    updateCatalogItem(
+      "ingredients",
+      id,
+      name,
+      setPantryIngredients,
+      "un ingrediente",
+    );
+  const removeIngredient = (id) =>
+    deleteCatalogItem(
+      "ingredients",
+      id,
+      setPantryIngredients,
+      "el ingrediente",
+    );
+  const addCategory = (name) =>
+    createCatalogItem("categories", name, setCategoryCatalog, "una categoria");
+  const renameCategory = (id, name) =>
+    updateCatalogItem(
+      "categories",
+      id,
+      name,
+      setCategoryCatalog,
+      "una categoria",
+    );
+  const removeCategory = (id) =>
+    deleteCatalogItem("categories", id, setCategoryCatalog, "la categoria");
 
   async function submitRecipe(recipeDraft) {
     requireSupabase();
@@ -361,6 +495,8 @@ export function useRecipeCatalog(user, profile) {
   }
 
   return {
+    addCategory,
+    addIngredient,
     approvedRecipes,
     categories,
     moderateRecipe,
@@ -368,6 +504,10 @@ export function useRecipeCatalog(user, profile) {
     pendingRecipes,
     recipeCatalog,
     reloadCatalog: loadCatalog,
+    removeCategory,
+    removeIngredient,
+    renameCategory,
+    renameIngredient,
     submitRecipe,
     syncState,
     updateRecipe,

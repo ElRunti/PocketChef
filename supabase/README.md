@@ -14,6 +14,8 @@ The migration preserves the existing tables, adds the social and user-interest
 tables, enables RLS, creates the profile trigger, seeds categories and
 ingredients, and configures the `recipe-images` storage bucket. The app reads
 all recipe, category, ingredient, profile and community data from Supabase.
+Administrators can manage categories and ingredients from the app after this
+migration grants the corresponding RLS-protected permissions.
 
 Do not commit an administrator password or insert rows directly into
 `auth.users`. Supabase Auth owns that schema; the private promotion function is

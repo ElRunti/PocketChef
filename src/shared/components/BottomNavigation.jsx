@@ -1,4 +1,5 @@
 import { Heart, Home, PlusCircle, Refrigerator, Search } from "lucide-react";
+import { createPortal } from "react-dom";
 
 const defaultNavItems = [
   { id: "home", label: "Inicio", icon: Home, active: true },
@@ -13,7 +14,7 @@ export function BottomNavigation({
   items = defaultNavItems,
   onNavigate,
 }) {
-  return (
+  return createPortal(
     <nav
       aria-label="Navegacion principal"
       className="bottom-navigation"
@@ -35,6 +36,7 @@ export function BottomNavigation({
           </button>
         );
       })}
-    </nav>
+    </nav>,
+    document.body,
   );
 }

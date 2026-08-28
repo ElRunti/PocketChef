@@ -9,6 +9,7 @@ const statusLabels = {
 
 export function ModerationRecipeCard({
   categories,
+  disabled,
   recipe,
   onEdit,
   onModerate,
@@ -34,26 +35,37 @@ export function ModerationRecipeCard({
           <span>Por {recipe.author ?? "Comunidad"}</span>
         </div>
         <div className="moderation-actions">
-          <button className="secondary" onClick={() => onEdit(recipe.id)} type="button">
+          <button
+            className="secondary"
+            disabled={disabled}
+            onClick={() => onEdit(recipe.id)}
+            type="button"
+          >
             <Pencil aria-hidden="true" size={16} />
             Editar
           </button>
-          <button
-            className="approve"
-            onClick={() => onModerate(recipe.id, "approved")}
-            type="button"
-          >
-            <Check aria-hidden="true" size={16} />
-            Aprobar
-          </button>
-          <button
-            className="reject"
-            onClick={() => onModerate(recipe.id, "rejected")}
-            type="button"
-          >
-            <X aria-hidden="true" size={16} />
-            Rechazar
-          </button>
+          {recipe.status !== "approved" && (
+            <button
+              className="approve"
+              disabled={disabled}
+              onClick={() => onModerate(recipe.id, "approved")}
+              type="button"
+            >
+              <Check aria-hidden="true" size={16} />
+              Aprobar
+            </button>
+          )}
+          {recipe.status !== "rejected" && (
+            <button
+              className="reject"
+              disabled={disabled}
+              onClick={() => onModerate(recipe.id, "rejected")}
+              type="button"
+            >
+              <X aria-hidden="true" size={16} />
+              Rechazar
+            </button>
+          )}
         </div>
       </div>
     </article>

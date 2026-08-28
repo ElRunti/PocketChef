@@ -29,6 +29,8 @@ const navItems = [
 export function App() {
   const auth = useAuth();
   const {
+    addCategory,
+    addIngredient,
     recipeCatalog,
     approvedRecipes,
     categories,
@@ -37,6 +39,10 @@ export function App() {
     submitRecipe,
     updateRecipe,
     moderateRecipe,
+    removeCategory,
+    removeIngredient,
+    renameCategory,
+    renameIngredient,
     syncState,
   } = useRecipeCatalog(auth.user, auth.profile);
   const {
@@ -251,14 +257,6 @@ export function App() {
     }
   }
 
-  async function handleModeration(recipeId, status) {
-    try {
-      await moderateRecipe(recipeId, status);
-    } catch {
-      // Supabase remains the source of truth when a request fails.
-    }
-  }
-
   async function handleToggleFavorite(recipeId) {
     if (!auth.user) {
       setPostAuthView(activeView);
@@ -433,11 +431,18 @@ export function App() {
     return (
       <AdminPage
         {...sharedPageProps}
+        categories={categories}
+        ingredients={pantryIngredients}
+        onAddCategory={addCategory}
+        onAddIngredient={addIngredient}
         onBack={() => navigateTo("home")}
         onEditRecipe={openAdminEditor}
-        onModerateRecipe={handleModeration}
+        onModerateRecipe={moderateRecipe}
+        onRemoveCategory={removeCategory}
+        onRemoveIngredient={removeIngredient}
+        onRenameCategory={renameCategory}
+        onRenameIngredient={renameIngredient}
         recipeCatalog={recipeCatalog}
-        categories={categories}
       />
     );
   }
