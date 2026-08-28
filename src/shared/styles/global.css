@@ -536,7 +536,6 @@ img {
 }
 
 .category-tabs button.active {
-  animation: selectedPop 180ms var(--motion-ease);
   background: var(--green);
   border-color: var(--green);
   color: white;
@@ -597,15 +596,26 @@ img {
 }
 
 .ingredient-grid button.selected {
-  animation: selectedPop 180ms var(--motion-ease);
   background: var(--orange-soft);
   border-color: var(--orange);
   color: #8c2d18;
 }
 
-.ingredient-grid button.selected svg,
-.pantry-chip.selected svg {
-  animation: checkIn 190ms var(--motion-ease) both;
+.ingredient-grid .selection-check,
+.pantry-chip .selection-check {
+  flex: 0 0 auto;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.78) rotate(-8deg);
+  transition:
+    opacity 160ms var(--motion-ease),
+    transform 160ms var(--motion-ease);
+}
+
+.ingredient-grid button.selected .selection-check,
+.pantry-chip.selected .selection-check {
+  opacity: 1;
+  transform: none;
 }
 
 .ingredient-grid span {
@@ -776,10 +786,15 @@ img {
   color: var(--orange);
 }
 
+.recipe-card-header button svg,
+.favorite-remove-button svg {
+  transition: transform 160ms var(--motion-ease);
+  transform-origin: center;
+}
+
 .recipe-card-header button.favorited svg,
 .favorite-remove-button svg {
-  animation: favoriteBeat 210ms var(--motion-ease) both;
-  transform-origin: center;
+  transform: scale(1.08);
 }
 
 .favorite-remove-button {
@@ -906,11 +921,7 @@ img {
 }
 
 .progress-value {
-  animation: progressGlow 1.8s linear infinite;
-  background:
-    linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.38), transparent),
-    var(--green);
-  background-size: 180% 100%;
+  background: linear-gradient(90deg, var(--green), #32a46f);
   border-radius: inherit;
   height: 100%;
   transform: scaleX(var(--progress, 0));
@@ -982,6 +993,7 @@ img {
   gap: 0.2rem;
   justify-content: center;
   min-height: 3rem;
+  padding: 0.25rem 0.1rem;
   transition:
     transform 140ms var(--motion-ease),
     background 160ms ease,
@@ -1246,7 +1258,6 @@ img {
 }
 
 .pantry-chip.selected {
-  animation: selectedPop 180ms var(--motion-ease);
   background: var(--orange-soft);
   border-color: var(--orange);
   color: #8c2d18;
@@ -1412,7 +1423,6 @@ img {
 }
 
 .filter-chip-row button.active {
-  animation: selectedPop 180ms var(--motion-ease);
   background: var(--green);
   color: white;
 }
@@ -1506,7 +1516,6 @@ img {
 }
 
 .recipe-result-card.active {
-  animation: selectedPop 180ms var(--motion-ease);
   border-color: var(--green);
   box-shadow: 0 0 0 3px var(--green-soft);
 }
@@ -1945,11 +1954,22 @@ img {
 }
 
 .step-timer strong {
-  animation: timerPulse 1.8s var(--motion-ease-in-out) infinite;
   display: block;
   font-size: clamp(2rem, 10vw, 3rem);
   line-height: 1;
   margin-top: 0.8rem;
+  transition:
+    color 160ms ease,
+    transform 160ms var(--motion-ease);
+}
+
+.step-timer.running strong {
+  animation: timerPulse 1.8s var(--motion-ease-in-out) infinite;
+}
+
+.step-timer.finished strong {
+  color: var(--red);
+  transform: scale(1.02);
 }
 
 .timer-actions {
@@ -2124,16 +2144,6 @@ button:not(:disabled):active:not(:focus-visible),
   }
 }
 
-@keyframes progressGlow {
-  from {
-    background-position: 180% 0;
-  }
-
-  to {
-    background-position: -180% 0;
-  }
-}
-
 @keyframes steamRise {
   0% {
     opacity: 0;
@@ -2147,18 +2157,6 @@ button:not(:disabled):active:not(:focus-visible),
   100% {
     opacity: 0;
     transform: translate3d(0.2rem, -0.55rem, 0) scaleY(1.08);
-  }
-}
-
-@keyframes checkIn {
-  from {
-    opacity: 0;
-    transform: scale(0.72) rotate(-10deg);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
   }
 }
 
@@ -2196,12 +2194,6 @@ button:not(:disabled):active:not(:focus-visible),
   }
 }
 
-@keyframes favoriteBeat {
-  45% {
-    transform: scale(1.18) rotate(-6deg);
-  }
-}
-
 @keyframes navIconIn {
   from {
     opacity: 0.65;
@@ -2211,12 +2203,6 @@ button:not(:disabled):active:not(:focus-visible),
   to {
     opacity: 1;
     transform: none;
-  }
-}
-
-@keyframes selectedPop {
-  50% {
-    transform: scale(1.02);
   }
 }
 
@@ -2345,12 +2331,8 @@ button:not(:disabled):active:not(:focus-visible),
   .step-timer strong,
   .brand-icon::before,
   .brand-icon::after,
-  .ingredient-grid button.selected svg,
-  .pantry-chip.selected svg,
   .featured-badges span:first-child svg,
   .interactive-step-heading > svg,
-  .recipe-card-header button.favorited svg,
-  .favorite-remove-button svg,
   .bottom-navigation button.active svg {
     animation: none !important;
   }
@@ -2962,7 +2944,6 @@ button:not(:disabled):active:not(:focus-visible),
 
 .star-rating button.active {
   color: #e8a11d;
-  animation: selectedPop 160ms var(--motion-ease);
 }
 
 .comment-form {

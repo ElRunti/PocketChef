@@ -29,7 +29,11 @@ export function IngredientSelector({
               aria-pressed={isSelected}
             >
               <span>{ingredient.label}</span>
-              {isSelected && <Check aria-hidden="true" size={17} />}
+              <Check
+                aria-hidden="true"
+                className="selection-check"
+                size={17}
+              />
             </button>
           );
         })}

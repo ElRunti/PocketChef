@@ -10,7 +10,11 @@ export function StepTimer({
   const isFinished = remainingSeconds === 0;
 
   return (
-    <section className="step-timer">
+    <section
+      className={`step-timer${
+        isFinished ? " finished" : isRunning ? " running" : ""
+      }`}
+    >
       <div>
         <Timer aria-hidden="true" size={22} />
         <span>Temporizador</span>
