@@ -17,6 +17,7 @@ import { RecipeDetailPage } from "./features/recipes/RecipeDetailPage.jsx";
 import { RecipesPage } from "./features/recipes/RecipesPage.jsx";
 import { useRecipeCatalog } from "./features/recipes/hooks/useRecipeCatalog.js";
 import SubirRecetaPage from "./features/subir-receta/SubirRecetaPage.jsx";
+import { UserDashboardPage } from "./features/user-dashboard/UserDashboardPage.jsx";
 
 const navItems = [
   { id: "home", label: "Inicio", icon: Home },
@@ -82,11 +83,16 @@ export function App() {
     recipeCatalog.find((recipe) => recipe.id === selectedModerationRecipeId) ??
     pendingRecipes[0] ??
     recipeCatalog[0];
+  const userRecipes = auth.user
+    ? recipeCatalog.filter((recipe) => recipe.userId === auth.user.id)
+    : [];
 
   const activeNavItemId =
     ["recipe-detail", "recipe-community", "interactive"].includes(activeView)
       ? "recipes"
-      : ["admin", "admin-edit", "discover"].includes(activeView)
+      : ["admin", "admin-edit", "discover", "user-dashboard"].includes(
+            activeView,
+          )
         ? "home"
         : activeView;
 
@@ -147,9 +153,19 @@ export function App() {
   }
 
   function navigateTo(viewId) {
-    if (viewId === "upload" && auth.isConfigured && !auth.user) {
-      setPostAuthView("upload");
-      setAccessMessage("Inicia sesion para publicar una receta.");
+    const authenticatedViewMessages = {
+      favorites: "Inicia sesion para consultar tus recetas favoritas.",
+      upload: "Inicia sesion para publicar una receta.",
+      "user-dashboard": "Inicia sesion para entrar a Mi cocina.",
+    };
+
+    if (
+      authenticatedViewMessages[viewId] &&
+      auth.isConfigured &&
+      !auth.user
+    ) {
+      setPostAuthView(viewId);
+      setAccessMessage(authenticatedViewMessages[viewId]);
       updateScreen(() => setActiveView("auth"));
       return;
     }
@@ -416,6 +432,35 @@ export function App() {
     );
   }
 
+  if (activeView === "user-dashboard") {
+    if (auth.isConfigured && !auth.user) {
+      return (
+        <AuthPage
+          {...sharedPageProps}
+          accessMessage="Inicia sesion para entrar a Mi cocina."
+          auth={auth}
+          onBack={() => navigateTo("home")}
+        />
+      );
+    }
+
+    return (
+      <UserDashboardPage
+        {...sharedPageProps}
+        approvedRecipes={approvedRecipes}
+        categories={categories}
+        currentProfile={auth.profile}
+        favoriteRecipeIds={favoriteRecipeIds}
+        onBack={() => navigateTo("home")}
+        onOpenRecipe={openRecipeDetail}
+        onOpenRecipes={() => openRecipes()}
+        onOpenUpload={() => navigateTo("upload")}
+        onToggleFavorite={handleToggleFavorite}
+        userRecipes={userRecipes}
+      />
+    );
+  }
+
   if (activeView === "admin") {
     if (!auth.isAdmin) {
       return (
@@ -505,6 +550,7 @@ export function App() {
       categories={categories}
       currentProfile={auth.profile}
       isAdmin={auth.isAdmin}
+      isAuthenticated={Boolean(auth.user)}
       isFavorite={isFavorite}
       selectedIngredientIds={selectedIngredientIds}
       onOpenIngredients={() => navigateTo("ingredients")}
@@ -513,6 +559,7 @@ export function App() {
       onOpenDiscover={() => navigateTo("discover")}
       onOpenRecipes={openRecipes}
       onOpenRecipeDetail={openRecipeDetail}
+      onOpenUserDashboard={() => navigateTo("user-dashboard")}
       onStartInteractive={openInteractive}
       onToggleFavorite={handleToggleFavorite}
       onToggleIngredient={toggleIngredient}

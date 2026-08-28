@@ -24,6 +24,7 @@ export function HomePage({
   categories,
   currentProfile,
   isAdmin,
+  isAuthenticated,
   pendingRecipes,
   pantryIngredients,
   syncState,
@@ -37,6 +38,7 @@ export function HomePage({
   onOpenDiscover,
   onOpenRecipes,
   onOpenRecipeDetail,
+  onOpenUserDashboard,
   onStartInteractive,
   activeView,
   navItems,
@@ -63,9 +65,11 @@ export function HomePage({
         <AppHeader
           currentProfile={currentProfile}
           isAdmin={isAdmin}
+          isAuthenticated={isAuthenticated}
           onOpenAccount={onOpenAccount}
           onOpenAdmin={onOpenAdmin}
           onOpenDiscover={onOpenDiscover}
+          onOpenUserDashboard={onOpenUserDashboard}
           pendingCount={pendingRecipes.length}
         />
 

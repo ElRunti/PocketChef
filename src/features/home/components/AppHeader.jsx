@@ -1,12 +1,20 @@
-import { ChefHat, LayoutDashboard, Sparkles, UserRound } from "lucide-react";
+import {
+  BookOpenCheck,
+  ChefHat,
+  LayoutDashboard,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
 
 export function AppHeader({
   currentProfile,
   isAdmin,
+  isAuthenticated,
   pendingCount,
   onOpenAccount,
   onOpenAdmin,
   onOpenDiscover,
+  onOpenUserDashboard,
 }) {
   return (
     <header className="app-header">
@@ -39,6 +47,17 @@ export function AppHeader({
             <LayoutDashboard aria-hidden="true" size={19} />
             <strong>Administrar</strong>
             {pendingCount > 0 && <span>{pendingCount}</span>}
+          </button>
+        )}
+        {isAuthenticated && !isAdmin && (
+          <button
+            aria-label="Abrir mi panel de recetas"
+            className="user-dashboard-button"
+            onClick={onOpenUserDashboard}
+            type="button"
+          >
+            <BookOpenCheck aria-hidden="true" size={19} />
+            <strong>Mi cocina</strong>
           </button>
         )}
         <button
