@@ -27,6 +27,8 @@ const navItems = [
   { id: "favorites", label: "Favoritos", icon: Heart },
 ];
 
+const primaryNavViewIds = new Set(navItems.map(({ id }) => id));
+
 export function App() {
   const auth = useAuth();
   const {
@@ -193,6 +195,12 @@ export function App() {
         `${window.location.pathname}${window.location.search}`,
       );
     }
+
+    if (primaryNavViewIds.has(activeView) && primaryNavViewIds.has(viewId)) {
+      setActiveView(viewId);
+      return;
+    }
+
     updateScreen(() => setActiveView(viewId));
   }
 

@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight } from "lucide-react";
 
 export function StepNavigator({
   isFirstStep,
@@ -13,8 +13,12 @@ export function StepNavigator({
         Anterior
       </button>
       <button disabled={isLastStep} onClick={onNext} type="button">
-        Siguiente
-        <ChevronRight aria-hidden="true" size={19} />
+        {isLastStep ? "Listo" : "Siguiente"}
+        {isLastStep ? (
+          <Check aria-hidden="true" size={19} />
+        ) : (
+          <ChevronRight aria-hidden="true" size={19} />
+        )}
       </button>
     </div>
   );

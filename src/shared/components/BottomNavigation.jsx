@@ -26,7 +26,9 @@ export function BottomNavigation({
 
         return (
           <button
+            aria-current={isActive ? "page" : undefined}
             className={isActive ? "active" : ""}
+            data-nav-item={item.id}
             key={item.id}
             onClick={() => onNavigate?.(item.id)}
             type="button"

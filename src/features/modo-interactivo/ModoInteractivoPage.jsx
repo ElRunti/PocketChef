@@ -1,4 +1,5 @@
-import { ArrowLeft, Check, Utensils } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Check, CircleCheckBig, Utensils } from "lucide-react";
 import { BottomNavigation } from "../../shared/components/BottomNavigation.jsx";
 import { getIngredientLabel } from "../recipes/model/recipeModel.js";
 import { StepNavigator } from "./components/StepNavigator.jsx";
@@ -26,6 +27,17 @@ export function ModoInteractivoPage({
     totalSteps,
     actions,
   } = useInteractiveRecipe(selectedRecipe);
+  const [stepDirection, setStepDirection] = useState("forward");
+
+  function goToNextStep() {
+    setStepDirection("forward");
+    actions.goToNextStep();
+  }
+
+  function goToPreviousStep() {
+    setStepDirection("backward");
+    actions.goToPreviousStep();
+  }
 
   return (
     <main className="app-shell screen-page">
@@ -72,16 +84,26 @@ export function ModoInteractivoPage({
               </div>
             </div>
 
-            <article className="interactive-step-card" key={activeStep}>
-              <span>Paso {activeStep + 1}</span>
+            <article
+              className={`interactive-step-card ${stepDirection}${
+                isLastStep ? " complete" : ""
+              }`}
+              key={activeStep}
+            >
+              <div className="interactive-step-heading">
+                <span>Paso {activeStep + 1}</span>
+                {isLastStep && (
+                  <CircleCheckBig aria-hidden="true" size={24} strokeWidth={2.4} />
+                )}
+              </div>
               <p>{currentStep}</p>
             </article>
 
             <StepNavigator
               isFirstStep={isFirstStep}
               isLastStep={isLastStep}
-              onNext={actions.goToNextStep}
-              onPrevious={actions.goToPreviousStep}
+              onNext={goToNextStep}
+              onPrevious={goToPreviousStep}
             />
           </section>
 
