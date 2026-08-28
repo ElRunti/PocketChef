@@ -1,13 +1,19 @@
 :root {
-  --background: #fffaf3;
-  --foreground: #17201a;
-  --muted: #607065;
-  --line: #dce8d5;
-  --green: #1f7a5c;
-  --green-soft: #e7f4ee;
-  --orange: #f15f3b;
-  --orange-soft: #fff0e8;
-  --blue: #3b63d9;
+  --background: #fff8ed;
+  --surface: #fffdf9;
+  --surface-muted: #f3f8ef;
+  --foreground: #183025;
+  --muted: #5d6f64;
+  --line: #d6e4d5;
+  --green: #14784f;
+  --green-soft: #e1f5e9;
+  --orange: #d63f1e;
+  --orange-soft: #ffe9df;
+  --yellow-soft: #fff3ce;
+  --blue: #315fcc;
+  --blue-soft: #e8efff;
+  --red: #d13f4d;
+  --red-soft: #ffe9ec;
   --motion-ease: cubic-bezier(0.23, 1, 0.32, 1);
   --motion-ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   font-family:
@@ -51,7 +57,7 @@ button:disabled {
 }
 
 :where(button, input, textarea, select, [tabindex]):focus-visible {
-  outline: 3px solid rgba(59, 99, 217, 0.32);
+  outline: 3px solid rgba(49, 95, 204, 0.34);
   outline-offset: 2px;
 }
 
@@ -69,7 +75,7 @@ img {
 }
 
 .app-shell {
-  background: linear-gradient(180deg, #fff7ec 0%, #f7fbf2 46%, #f6f7fb 100%);
+  background: linear-gradient(180deg, #fff0e2 0%, #fffaf1 34%, #eef8ed 72%, #f3f6ff 100%);
   min-height: 100vh;
   overflow-x: clip;
   padding-bottom: calc(5.75rem + env(safe-area-inset-bottom));
@@ -121,7 +127,30 @@ img {
   display: grid;
   height: 2.75rem;
   justify-content: center;
+  overflow: visible;
+  position: relative;
   width: 2.75rem;
+}
+
+.brand-icon::before,
+.brand-icon::after {
+  animation: steamRise 2.6s linear infinite;
+  border-left: 2px solid rgba(214, 63, 30, 0.58);
+  border-radius: 999px;
+  content: "";
+  height: 0.75rem;
+  left: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  top: -0.7rem;
+  transform-origin: bottom;
+  width: 0.35rem;
+}
+
+.brand-icon::after {
+  animation-delay: 1.15s;
+  left: 1.65rem;
 }
 
 .brand p,
@@ -144,7 +173,7 @@ img {
 }
 
 .icon-button {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   color: #243528;
@@ -156,6 +185,18 @@ img {
     box-shadow 180ms var(--motion-ease),
     background 180ms ease;
   width: 2.75rem;
+}
+
+.header-actions > .icon-button:first-child {
+  background: var(--yellow-soft);
+  border-color: #f2d987;
+  color: #825900;
+}
+
+.header-actions > .icon-button:last-child {
+  background: var(--blue-soft);
+  border-color: #cbd8ff;
+  color: var(--blue);
 }
 
 .notification-button {
@@ -217,7 +258,7 @@ img {
 }
 
 .search-panel label {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.35rem 1rem rgba(23, 32, 26, 0.08);
@@ -265,7 +306,7 @@ img {
   animation: riseIn 280ms var(--motion-ease) 50ms both;
   background: var(--foreground);
   border-radius: 0.5rem;
-  box-shadow: 0 1rem 2rem rgba(23, 32, 26, 0.2);
+  box-shadow: 0 1rem 2rem rgba(77, 47, 24, 0.22);
   color: white;
   margin-top: 1.5rem;
   min-height: 14.75rem;
@@ -365,6 +406,7 @@ img {
   gap: 0.45rem;
   min-height: 2.75rem;
   padding: 0 1rem;
+  box-shadow: 0 0.5rem 1rem rgba(214, 63, 30, 0.3);
 }
 
 .home-action-grid {
@@ -377,8 +419,8 @@ img {
 .home-action-grid button {
   align-items: flex-start;
   animation: cardIn 220ms var(--motion-ease) both;
-  background: white;
-  border: 1px solid var(--line);
+  background: var(--orange-soft);
+  border: 1px solid #f6cbbb;
   border-radius: 0.5rem;
   box-shadow: 0 0.4rem 1.25rem rgba(23, 32, 26, 0.06);
   color: var(--foreground);
@@ -436,7 +478,7 @@ img {
 }
 
 .category-tabs button {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   color: #4d5f55;
@@ -452,6 +494,7 @@ img {
 }
 
 .category-tabs button.active {
+  animation: selectedPop 180ms var(--motion-ease);
   background: var(--green);
   border-color: var(--green);
   color: white;
@@ -494,7 +537,7 @@ img {
 
 .ingredient-grid button {
   align-items: center;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   color: #4d5f55;
@@ -512,9 +555,15 @@ img {
 }
 
 .ingredient-grid button.selected {
+  animation: selectedPop 180ms var(--motion-ease);
   background: var(--orange-soft);
   border-color: var(--orange);
   color: #8c2d18;
+}
+
+.ingredient-grid button.selected svg,
+.pantry-chip.selected svg {
+  animation: checkIn 190ms var(--motion-ease) both;
 }
 
 .ingredient-grid span {
@@ -533,7 +582,7 @@ img {
 .guided-mode,
 .recipe-card,
 .empty-state {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.4rem 1.25rem rgba(23, 32, 26, 0.06);
@@ -541,16 +590,22 @@ img {
 
 .summary-card {
   animation: cardIn 210ms var(--motion-ease) both;
+  background: var(--orange-soft);
+  border-color: #f6cbbb;
   min-width: 0;
   padding: 0.75rem;
 }
 
 .summary-card:nth-child(2) {
   animation-delay: 35ms;
+  background: var(--green-soft);
+  border-color: #b9dfca;
 }
 
 .summary-card:nth-child(3) {
   animation-delay: 70ms;
+  background: var(--blue-soft);
+  border-color: #c7d6ff;
 }
 
 .summary-card svg:first-child {
@@ -612,6 +667,7 @@ img {
   border-radius: 0.5rem;
   height: 8rem;
   object-fit: cover;
+  transition: transform 220ms var(--motion-ease);
   width: 100%;
 }
 
@@ -675,6 +731,12 @@ img {
   color: var(--orange);
 }
 
+.recipe-card-header button.favorited svg,
+.favorite-remove-button svg {
+  animation: favoriteBeat 210ms var(--motion-ease) both;
+  transform-origin: center;
+}
+
 .favorite-remove-button {
   background: var(--orange-soft);
   color: var(--orange);
@@ -721,6 +783,10 @@ img {
   gap: 0.2rem;
   min-height: 2.25rem;
   padding: 0 0.65rem;
+  transition:
+    transform 160ms var(--motion-ease),
+    background-color 160ms ease,
+    box-shadow 160ms var(--motion-ease);
 }
 
 .empty-state {
@@ -829,7 +895,7 @@ img {
 .bottom-navigation {
   --nav-offset: 0;
   backdrop-filter: blur(16px);
-  background: rgba(255, 255, 255, 0.94);
+  background: rgba(255, 253, 249, 0.95);
   border-top: 1px solid var(--line);
   bottom: 0;
   box-shadow: 0 -0.7rem 2rem rgba(23, 32, 26, 0.08);
@@ -865,6 +931,10 @@ img {
 .bottom-navigation button.active {
   background: var(--green-soft);
   color: var(--green);
+}
+
+.bottom-navigation button.active svg {
+  animation: navIconIn 190ms var(--motion-ease) both;
 }
 
 .bottom-navigation span {
@@ -1076,7 +1146,7 @@ img {
 .pantry-chip {
   align-items: center;
   animation: cardIn 200ms var(--motion-ease) both;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   color: #4d5f55;
@@ -1095,7 +1165,7 @@ img {
 }
 
 .pantry-chip.selected {
-  animation: selectedPop 160ms var(--motion-ease);
+  animation: selectedPop 180ms var(--motion-ease);
   background: var(--orange-soft);
   border-color: var(--orange);
   color: #8c2d18;
@@ -1115,7 +1185,7 @@ img {
 
 .recommendation-card {
   animation: cardIn 220ms var(--motion-ease) both;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.4rem 1.25rem rgba(23, 32, 26, 0.06);
@@ -1135,6 +1205,7 @@ img {
   border-radius: 0.45rem;
   height: 4.5rem;
   object-fit: cover;
+  transition: transform 220ms var(--motion-ease);
   width: 4.5rem;
 }
 
@@ -1190,7 +1261,7 @@ img {
 .interactive-side-panel,
 .step-timer,
 .cooking-checklist {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.4rem 1.25rem rgba(23, 32, 26, 0.06);
@@ -1260,6 +1331,7 @@ img {
 }
 
 .filter-chip-row button.active {
+  animation: selectedPop 180ms var(--motion-ease);
   background: var(--green);
   color: white;
 }
@@ -1318,7 +1390,7 @@ img {
 
 .recipe-result-card {
   animation: cardIn 220ms var(--motion-ease) both;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   color: var(--foreground);
@@ -1353,6 +1425,7 @@ img {
 }
 
 .recipe-result-card.active {
+  animation: selectedPop 180ms var(--motion-ease);
   border-color: var(--green);
   box-shadow: 0 0 0 3px var(--green-soft);
 }
@@ -1361,6 +1434,7 @@ img {
   border-radius: 0.45rem;
   height: 5.25rem;
   object-fit: cover;
+  transition: transform 220ms var(--motion-ease);
   width: 5.25rem;
 }
 
@@ -1795,6 +1869,22 @@ img {
     box-shadow: 0 0.7rem 1.5rem rgba(23, 32, 26, 0.1);
     transform: translateY(-1px);
   }
+
+  .recipe-card:hover > img,
+  .recommendation-card:hover img,
+  .recipe-result-card:hover > img,
+  .discovery-recipe-card:hover > img,
+  .moderation-card:hover > img,
+  .user-recipe-card:hover > img {
+    transform: scale(1.025);
+  }
+
+  .featured-actions button:hover,
+  .recipe-card-open:hover,
+  .ingredient-search-button:hover {
+    box-shadow: 0 0.65rem 1.25rem rgba(20, 120, 79, 0.2);
+    transform: translateY(-1px);
+  }
 }
 
 button:not(:disabled):active:not(:focus-visible),
@@ -1889,6 +1979,52 @@ button:not(:disabled):active:not(:focus-visible),
 
   to {
     background-position: -180% 0;
+  }
+}
+
+@keyframes steamRise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0.25rem, 0) scaleY(0.82);
+  }
+
+  24% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0.2rem, -0.55rem, 0) scaleY(1.08);
+  }
+}
+
+@keyframes checkIn {
+  from {
+    opacity: 0;
+    transform: scale(0.72) rotate(-10deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes favoriteBeat {
+  45% {
+    transform: scale(1.18) rotate(-6deg);
+  }
+}
+
+@keyframes navIconIn {
+  from {
+    opacity: 0.65;
+    transform: translate3d(0, 0.2rem, 0) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
   }
 }
 
@@ -2020,7 +2156,14 @@ button:not(:disabled):active:not(:focus-visible),
   .recipe-detail-hero img,
   .interactive-image img,
   .progress-value,
-  .step-timer strong {
+  .step-timer strong,
+  .brand-icon::before,
+  .brand-icon::after,
+  .ingredient-grid button.selected svg,
+  .pantry-chip.selected svg,
+  .recipe-card-header button.favorited svg,
+  .favorite-remove-button svg,
+  .bottom-navigation button.active svg {
     animation: none !important;
   }
 
@@ -2028,7 +2171,13 @@ button:not(:disabled):active:not(:focus-visible),
   .recipe-result-card,
   .recipe-card,
   .recommendation-card,
-  .pantry-chip {
+  .pantry-chip,
+  .recipe-card > img,
+  .recommendation-card img,
+  .recipe-result-card > img,
+  .discovery-recipe-card > img,
+  .moderation-card > img,
+  .user-recipe-card > img {
     transform: none !important;
   }
 }
@@ -2441,7 +2590,7 @@ button:not(:disabled):active:not(:focus-visible),
 }
 
 .home-action-grid button:nth-child(4) svg {
-  color: #9a5a17;
+  color: #916000;
 }
 
 .recipe-detail-actions {
@@ -2455,9 +2604,24 @@ button:not(:disabled):active:not(:focus-visible),
 }
 
 .recipe-detail-actions button:nth-child(n + 2) {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   color: var(--foreground);
+}
+
+.home-action-grid button:nth-child(2) {
+  background: var(--green-soft);
+  border-color: #b9dfca;
+}
+
+.home-action-grid button:nth-child(3) {
+  background: var(--blue-soft);
+  border-color: #c7d6ff;
+}
+
+.home-action-grid button:nth-child(4) {
+  background: var(--yellow-soft);
+  border-color: #efd987;
 }
 
 .share-status,
@@ -2519,7 +2683,7 @@ button:not(:disabled):active:not(:focus-visible),
 .comments-panel,
 .interest-picker,
 .admin-editor-form {
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.5rem 1.5rem rgba(23, 32, 26, 0.06);
@@ -2765,7 +2929,7 @@ button:not(:disabled):active:not(:focus-visible),
 .discovery-recipe-card,
 .moderation-card {
   animation: cardIn 220ms var(--motion-ease) both;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.45rem 1.2rem rgba(23, 32, 26, 0.06);
@@ -2781,6 +2945,7 @@ button:not(:disabled):active:not(:focus-visible),
   height: 100%;
   min-height: 9.5rem;
   object-fit: cover;
+  transition: transform 220ms var(--motion-ease);
   width: 100%;
 }
 
@@ -2862,7 +3027,7 @@ button:not(:disabled):active:not(:focus-visible),
 
 .admin-summary > div {
   align-items: center;
-  background: white;
+  background: var(--yellow-soft);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   display: flex;
@@ -2872,12 +3037,28 @@ button:not(:disabled):active:not(:focus-visible),
   text-align: center;
 }
 
+.admin-summary > div:nth-child(2) {
+  background: var(--green-soft);
+}
+
+.admin-summary > div:nth-child(3) {
+  background: var(--orange-soft);
+}
+
+.admin-summary > div:nth-child(4) {
+  background: var(--blue-soft);
+}
+
 .admin-summary svg {
   color: var(--green);
 }
 
 .admin-summary > div:first-child svg {
-  color: #cf7b16;
+  color: #916000;
+}
+
+.admin-summary > div:nth-child(3) svg {
+  color: var(--orange);
 }
 
 .admin-summary > div:nth-child(4) svg {
@@ -2910,8 +3091,8 @@ button:not(:disabled):active:not(:focus-visible),
 }
 
 .status-badge.pending {
-  background: #fff3d4;
-  color: #8a5a00;
+  background: var(--yellow-soft);
+  color: #795100;
 }
 
 .status-badge.approved {
@@ -2920,8 +3101,8 @@ button:not(:disabled):active:not(:focus-visible),
 }
 
 .status-badge.rejected {
-  background: #fdecea;
-  color: #a9372c;
+  background: var(--red-soft);
+  color: var(--red);
 }
 
 .moderation-card-content > p {
@@ -3104,7 +3285,7 @@ button.reject {
 
 .admin-quick-actions > div:last-child > button {
   align-items: center;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   color: var(--foreground);
@@ -3127,6 +3308,16 @@ button.reject {
   height: 2.5rem;
   padding: 0.6rem;
   width: 2.5rem;
+}
+
+.admin-quick-actions > div:last-child > button:nth-child(2) > svg {
+  background: var(--orange-soft);
+  color: var(--orange);
+}
+
+.admin-quick-actions > div:last-child > button:nth-child(3) > svg {
+  background: var(--blue-soft);
+  color: var(--blue);
 }
 
 .admin-quick-actions button span {
@@ -3440,7 +3631,7 @@ button.reject {
 
 .user-summary > div {
   align-items: center;
-  background: white;
+  background: var(--blue-soft);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   display: flex;
@@ -3448,6 +3639,18 @@ button.reject {
   min-width: 0;
   padding: 0.8rem 0.4rem;
   text-align: center;
+}
+
+.user-summary > div:nth-child(2) {
+  background: var(--yellow-soft);
+}
+
+.user-summary > div:nth-child(3) {
+  background: var(--green-soft);
+}
+
+.user-summary > div:nth-child(4) {
+  background: var(--orange-soft);
 }
 
 .user-summary > div:first-child svg {
@@ -3593,7 +3796,7 @@ button.reject {
 
 .user-recipe-card {
   animation: cardIn 220ms var(--motion-ease) both;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.45rem 1.2rem rgba(23, 32, 26, 0.06);
@@ -3607,6 +3810,7 @@ button.reject {
   height: 100%;
   min-height: 12rem;
   object-fit: cover;
+  transition: transform 220ms var(--motion-ease);
   width: 100%;
 }
 
@@ -3843,7 +4047,7 @@ button.reject {
 .auth-panel,
 .account-panel {
   animation: riseIn 240ms var(--motion-ease) both;
-  background: white;
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 0.5rem;
   box-shadow: 0 0.75rem 2rem rgba(23, 32, 26, 0.08);
@@ -3934,9 +4138,9 @@ button.reject {
 }
 
 .sign-out-button {
-  background: white;
+  background: var(--red-soft);
   border: 1px solid #e5aaa5;
-  color: #a9372c;
+  color: var(--red);
   margin-top: 1.2rem;
 }
 
@@ -3964,7 +4168,7 @@ button.reject {
   padding: 28px;
   border: 1px solid #d9dfd7;
   border-radius: 8px;
-  background: #f7f8f4;
+  background: var(--surface-muted);
   color: #354039;
   text-align: center;
 }
@@ -3988,7 +4192,7 @@ button.reject {
 .auth-access-message,
 .auth-panel > .auth-access-message,
 .account-panel > .auth-access-message {
-  background: #fff3d4;
+  background: var(--yellow-soft);
   border: 1px solid #efd28d;
   color: #7b5300;
   margin-top: 1rem;
@@ -4014,7 +4218,7 @@ button.reject {
 }
 
 .account-role.admin {
-  background: #fff3d4;
+  background: var(--yellow-soft);
   border-color: #efd28d;
   color: #7b5300;
 }
