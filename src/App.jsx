@@ -22,8 +22,8 @@ import { UserDashboardPage } from "./features/user-dashboard/UserDashboardPage.j
 const navItems = [
   { id: "home", label: "Inicio", icon: Home },
   { id: "ingredients", label: "Despensa", icon: Refrigerator },
-  { id: "recipes", label: "Recetas", icon: Search },
   { id: "upload", label: "Subir", icon: PlusCircle },
+  { id: "recipes", label: "Recetas", icon: Search },
   { id: "favorites", label: "Favoritos", icon: Heart },
 ];
 

@@ -74,12 +74,21 @@ export function HomePage({
         />
 
         <div className="home-layout">
-          <div>
+          <div className="home-primary">
             <SearchPanel
               query={query}
               onOpenFilters={() => onOpenRecipes()}
               onQueryChange={setQuery}
             />
+            <div className="section-heading featured-heading">
+              <div>
+                <p>Destacada</p>
+                <h2>Elegida para ti</h2>
+              </div>
+              <button onClick={onOpenDiscover} type="button">
+                Ver todas
+              </button>
+            </div>
             {featuredRecipe ? (
               <FeaturedRecipe
                 recipe={featuredRecipe}
@@ -98,71 +107,29 @@ export function HomePage({
                 <p>{syncState.message}</p>
               </div>
             )}
-            <section className="home-action-grid">
-              <button onClick={onOpenIngredients} type="button">
-                <Refrigerator aria-hidden="true" size={22} />
-                <strong>Ingredientes</strong>
-                <span>Arma tu despensa</span>
-              </button>
-              <button onClick={() => onOpenRecipes()} type="button">
-                <Search aria-hidden="true" size={22} />
-                <strong>Recetas</strong>
-                <span>Busca y filtra</span>
-              </button>
-              <button
-                disabled={!featuredRecipe}
-                onClick={() => onStartInteractive(featuredRecipe.id)}
-                type="button"
-              >
-                <Timer aria-hidden="true" size={22} />
-                <strong>Modo guiado</strong>
-                <span>Cocina paso a paso</span>
-              </button>
-              <button onClick={onOpenDiscover} type="button">
-                <Sparkles aria-hidden="true" size={22} />
-                <strong>Descubre</strong>
-                <span>Para ti y populares</span>
-              </button>
-            </section>
-            <CategoryTabs
-              activeCategory={activeCategory}
-              categories={categories}
-              onCategoryChange={setActiveCategory}
-            />
-            <IngredientSelector
-              ingredients={pantryIngredients}
-              selectedIngredientIds={selectedIngredientIds}
-              onSearchByIngredients={onOpenIngredients}
-              onToggleIngredient={onToggleIngredient}
-            />
-          </div>
-
-          <div>
-            <section className="summary-grid">
-              <div className="summary-card">
-                <Utensils aria-hidden="true" size={20} />
-                <strong>{filteredRecipes.length}</strong>
-                <span>compatibles</span>
+            <section className="home-categories">
+              <div className="section-heading">
+                <div>
+                  <p>Categorias</p>
+                  <h2>¿Que quieres cocinar?</h2>
+                </div>
               </div>
-              <div className="summary-card">
-                <Refrigerator aria-hidden="true" size={20} />
-                <strong>{selectedIngredientIds.length}</strong>
-                <span>ingredientes</span>
-              </div>
-              <div className="summary-card">
-                <ShieldCheck aria-hidden="true" size={20} />
-                <strong>{pendingRecipes.length}</strong>
-                <span>revision</span>
-              </div>
+              <CategoryTabs
+                activeCategory={activeCategory}
+                categories={categories}
+                onCategoryChange={setActiveCategory}
+              />
             </section>
 
             <section className="recipe-results">
               <div className="section-heading">
                 <div>
-                  <p>Resultados</p>
+                  <p>Populares</p>
                   <h2>Recetas para hoy</h2>
                 </div>
-                <span>{filteredRecipes.length} listas</span>
+                <button onClick={() => onOpenRecipes()} type="button">
+                  Ver todas
+                </button>
               </div>
 
               <div className="recipe-list">
@@ -192,6 +159,68 @@ export function HomePage({
               </div>
             </section>
           </div>
+
+          <aside className="home-utility">
+            <section className="home-action-section">
+              <div className="section-heading">
+                <div>
+                  <p>Accesos</p>
+                  <h2>Tu cocina</h2>
+                </div>
+              </div>
+              <div className="home-action-grid">
+                <button onClick={onOpenIngredients} type="button">
+                  <Refrigerator aria-hidden="true" size={22} />
+                  <strong>Ingredientes</strong>
+                  <span>Arma tu despensa</span>
+                </button>
+                <button onClick={() => onOpenRecipes()} type="button">
+                  <Search aria-hidden="true" size={22} />
+                  <strong>Recetas</strong>
+                  <span>Busca y filtra</span>
+                </button>
+                <button
+                  disabled={!featuredRecipe}
+                  onClick={() => onStartInteractive(featuredRecipe.id)}
+                  type="button"
+                >
+                  <Timer aria-hidden="true" size={22} />
+                  <strong>Modo guiado</strong>
+                  <span>Cocina paso a paso</span>
+                </button>
+                <button onClick={onOpenDiscover} type="button">
+                  <Sparkles aria-hidden="true" size={22} />
+                  <strong>Descubre</strong>
+                  <span>Para ti y populares</span>
+                </button>
+              </div>
+            </section>
+
+            <IngredientSelector
+              ingredients={pantryIngredients}
+              selectedIngredientIds={selectedIngredientIds}
+              onSearchByIngredients={onOpenIngredients}
+              onToggleIngredient={onToggleIngredient}
+            />
+
+            <section className="summary-grid">
+              <div className="summary-card">
+                <Utensils aria-hidden="true" size={20} />
+                <strong>{filteredRecipes.length}</strong>
+                <span>compatibles</span>
+              </div>
+              <div className="summary-card">
+                <Refrigerator aria-hidden="true" size={20} />
+                <strong>{selectedIngredientIds.length}</strong>
+                <span>ingredientes</span>
+              </div>
+              <div className="summary-card">
+                <ShieldCheck aria-hidden="true" size={20} />
+                <strong>{pendingRecipes.length}</strong>
+                <span>revision</span>
+              </div>
+            </section>
+          </aside>
         </div>
       </div>
 
