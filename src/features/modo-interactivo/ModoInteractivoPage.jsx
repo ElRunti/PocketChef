@@ -57,12 +57,22 @@ export function ModoInteractivoPage({
 
             <div className="interactive-progress">
               <span>{progress}% listo</span>
-              <div className="progress-track">
-                <div className="progress-value" style={{ width: `${progress}%` }} />
+              <div
+                aria-label="Progreso de la receta"
+                aria-valuemax="100"
+                aria-valuemin="0"
+                aria-valuenow={progress}
+                className="progress-track"
+                role="progressbar"
+              >
+                <div
+                  className="progress-value"
+                  style={{ "--progress": progress / 100 }}
+                />
               </div>
             </div>
 
-            <article className="interactive-step-card">
+            <article className="interactive-step-card" key={activeStep}>
               <span>Paso {activeStep + 1}</span>
               <p>{currentStep}</p>
             </article>

@@ -17,8 +17,15 @@ export function GuidedModePreview({ steps, activeStep, onPrevious, onNext }) {
         </div>
       </div>
 
-      <div className="progress-track">
-        <div className="progress-value" style={{ width: `${progress}%` }} />
+      <div
+        aria-label="Progreso de la receta"
+        aria-valuemax="100"
+        aria-valuemin="0"
+        aria-valuenow={progress}
+        className="progress-track"
+        role="progressbar"
+      >
+        <div className="progress-value" style={{ "--progress": progress / 100 }} />
       </div>
 
       <p className="guided-step">{steps[activeStep]}</p>

@@ -29,8 +29,18 @@ export function PantrySummary({
 
         <div className="pantry-progress">
           <span>{selectedCount} seleccionados</span>
-          <div className="progress-track">
-            <div className="progress-value" style={{ width: `${pantryProgress}%` }} />
+          <div
+            aria-label="Progreso de ingredientes seleccionados"
+            aria-valuemax="100"
+            aria-valuemin="0"
+            aria-valuenow={pantryProgress}
+            className="progress-track"
+            role="progressbar"
+          >
+            <div
+              className="progress-value"
+              style={{ "--progress": pantryProgress / 100 }}
+            />
           </div>
         </div>
 
