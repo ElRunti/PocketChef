@@ -7,15 +7,21 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ignore-pattern dist --ignore-pattern node_modules --ignore-pattern work --ignore-pattern outputs"
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern node_modules --ignore-pattern android --ignore-pattern work --ignore-pattern outputs",
+    "android:sync": "npm run build && cap sync android",
+    "android:apk": "npm run android:sync && cd android && gradlew.bat assembleDebug",
+    "android:open": "npm run android:sync && cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
     "@supabase/supabase-js": "^2.112.4",
     "lucide-react": "^0.468.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.1",
     "@eslint/js": "^9.33.0",
     "@vitejs/plugin-react": "^5.0.0",
     "eslint": "^9.33.0",

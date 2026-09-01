@@ -1,0 +1,8 @@
+{
+  "appId": "com.pocketchef.app",
+  "appName": "PocketChef",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https"
+  }
+}
